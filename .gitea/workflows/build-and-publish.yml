@@ -76,9 +76,21 @@ jobs:
           echo "Starting container (note: backend services may not be available in test environment)"
           docker run -d --name test-shell -p 38106:38106 git.rokkon.com/io-pipeline/platform-shell:latest
 
+          # Get container IP address for direct connection (works better on some CI runners)
+          CONTAINER_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-shell)
+          echo "Container IP: $CONTAINER_IP"
+
+          # Try localhost first, fall back to container IP if needed
+          TEST_URL="http://localhost:38106"
+          if ! curl -f -m 1 http://localhost:38106/ >/dev/null 2>&1; then
+            echo "Localhost not accessible, using container IP instead"
+            TEST_URL="http://${CONTAINER_IP}:38106"
+          fi
+          echo "Using test URL: $TEST_URL"
+
           echo "Waiting for frontend to be ready..."
           for i in {1..30}; do
-            if curl -f http://localhost:38106/ >/dev/null 2>&1; then
+            if curl -f ${TEST_URL}/ >/dev/null 2>&1; then
               echo "Frontend is serving HTML!"
               break
             fi
@@ -88,14 +100,14 @@ jobs:
 
           # Verify frontend HTML is served
           echo "Testing frontend HTML response..."
-          curl -f http://localhost:38106/ || (echo "Frontend HTML test failed"; docker logs test-shell; exit 1)
+          curl -f ${TEST_URL}/ || (echo "Frontend HTML test failed"; docker logs test-shell; exit 1)
 
           # Check system status endpoint (may return 503 if backend services unavailable, which is OK)
           echo "Testing system status endpoint..."
-          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:38106/api/system-status)
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${TEST_URL}/api/system-status)
           if [ "$STATUS_CODE" = "200" ] || [ "$STATUS_CODE" = "503" ]; then
             echo "System status endpoint responding correctly (status: $STATUS_CODE)"
-            curl -s http://localhost:38106/api/system-status | head -20
+            curl -s ${TEST_URL}/api/system-status | head -20
           else
             echo "System status endpoint test failed with status: $STATUS_CODE"
             docker logs test-shell
