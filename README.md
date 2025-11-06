@@ -29,16 +29,18 @@ platform-frontend/
     └── protobuf-forms/          # Type-safe form generation
 ```
 
-## Published Packages
+## Packages
 
-All packages are published to npm under the `@io-pipeline` scope:
+This monorepo contains the following packages under the `@io-pipeline` scope:
 
-| Package | Version | Description |
-|---------|---------|-------------|
-| [@io-pipeline/shared-components](https://www.npmjs.com/package/@io-pipeline/shared-components) | 1.0.7 | Vue 3 + Vuetify 3 UI components with ComponentGallery |
-| [@io-pipeline/shared-nav](https://www.npmjs.com/package/@io-pipeline/shared-nav) | 1.0.0 | Navigation shell (AppShell, Drawer, AppBar) |
-| [@io-pipeline/connector-shared](https://www.npmjs.com/package/@io-pipeline/connector-shared) | 1.0.0 | Backend utilities for connectors and streaming |
-| [@io-pipeline/protobuf-forms](https://www.npmjs.com/package/@io-pipeline/protobuf-forms) | 1.0.0 | Type-safe form generation from protobuf messages |
+| Package | Version | Description | Registry |
+|---------|---------|-------------|----------|
+| @io-pipeline/shared-components | 1.0.7 | Vue 3 + Vuetify 3 UI components with ComponentGallery | Private |
+| @io-pipeline/shared-nav | 1.0.0 | Navigation shell (AppShell, Drawer, AppBar) | Private |
+| @io-pipeline/connector-shared | 1.0.0 | Backend utilities for connectors and streaming | Private |
+| @io-pipeline/protobuf-forms | 1.0.0 | Type-safe form generation from protobuf messages | Private |
+
+**Note**: Packages are published to a private npm registry. The monorepo depends on [@io-pipeline/grpc-stubs](https://www.npmjs.com/package/@io-pipeline/grpc-stubs) which is published to public npm.
 
 ## Prerequisites
 
@@ -172,12 +174,18 @@ pnpm --filter @io-pipeline/shared-components dev
 
 ### Publishing
 
-Packages are automatically published via CI/CD, but you can manually publish:
+Packages are published to the private Gitea npm registry. Ensure you have authentication configured in `.npmrc`:
 
 ```bash
+# Configure authentication (one-time setup)
+echo "//git.rokkon.com/api/packages/io-pipeline/npm/:_authToken=YOUR_TOKEN" >> ~/.npmrc
+
+# Publish a package
 cd packages/shared-components
 pnpm publish
 ```
+
+Packages are automatically published via CI/CD when changes are pushed to `main`.
 
 ## Environment Variables
 
@@ -372,9 +380,10 @@ MIT License - see [LICENSE](LICENSE) file for details
 ## Links
 
 - **GitHub Repository**: https://github.com/io-pipeline/platform-frontend
-- **npm Organization**: https://www.npmjs.com/org/io-pipeline
+- **Gitea Repository**: https://git.rokkon.com/io-pipeline/platform-frontend
 - **Issue Tracker**: https://github.com/io-pipeline/platform-frontend/issues
 - **Documentation**: [Platform Shell README](apps/platform-shell/README.md)
+- **Public Dependency**: [@io-pipeline/grpc-stubs on npm](https://www.npmjs.com/package/@io-pipeline/grpc-stubs)
 
 ## Support
 
