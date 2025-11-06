@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProtobufForm.vue Component Test</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/@jsonforms/core@3.7.0-alpha.0/lib/umd/jsonforms-core.umd.js"></script>
+    <script src="https://unpkg.com/@jsonforms/vue@3.7.0-alpha.0/lib/umd/jsonforms-vue.umd.js"></script>
+    <script src="https://unpkg.com/@jsonforms/vanilla-renderers@3.7.0-alpha.0/lib/umd/jsonforms-vanilla-renderers.umd.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@jsonforms/vanilla-renderers@3.7.0-alpha.0/lib/styles/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .form-output {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            background: #ffe6e6;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>ProtobufForm.vue Component Test</h1>
+    
+    <div id="app">
+        <div class="test-container">
+            <h2>Test 1: PipeDoc Form</h2>
+            <protobuf-form 
+                :message-type="'PipeDoc'"
+                :initial-data="pipeDocData"
+                @form-change="onPipeDocChange"
+                @form-submit="onPipeDocSubmit">
+            </protobuf-form>
+            <div class="form-output">
+                <h3>Current PipeDoc Data:</h3>
+                <pre>{{ JSON.stringify(pipeDocData, null, 2) }}</pre>
+            </div>
+        </div>
+
+        <div class="test-container">
+            <h2>Test 2: ApplyMappingRequest Form</h2>
+            <protobuf-form 
+                :message-type="'ApplyMappingRequest'"
+                :initial-data="mappingRequestData"
+                @form-change="onMappingRequestChange"
+                @form-submit="onMappingRequestSubmit">
+            </protobuf-form>
+            <div class="form-output">
+                <h3>Current ApplyMappingRequest Data:</h3>
+                <pre>{{ JSON.stringify(mappingRequestData, null, 2) }}</pre>
+            </div>
+        </div>
+
+        <div v-if="error" class="error">
+            <h3>Error:</h3>
+            <pre>{{ error }}</pre>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import our protobuf-forms library
+        import { ProtobufSchemaLoader } from './src/ProtobufSchemaLoader.js';
+        
+        const { createApp, ref, onMounted } = Vue;
+        
+        // Create ProtobufForm component
+        const ProtobufForm = {
+            props: {
+                messageType: {
+                    type: String,
+                    required: true
+                },
+                initialData: {
+                    type: Object,
+                    default: () => ({})
+                }
+            },
+            emits: ['form-change', 'form-submit'],
+            setup(props, { emit }) {
+                const schema = ref(null);
+                const uischema = ref(null);
+                const data = ref(props.initialData);
+                const error = ref(null);
+                const loader = ref(null);
+
+                onMounted(async () => {
+                    try {
+                        loader.value = new ProtobufSchemaLoader();
+                        const schemaResult = await loader.value.getJsonSchema(props.messageType);
+                        schema.value = schemaResult;
+                        
+                        // Generate basic UI schema
+                        uischema.value = {
+                            type: "VerticalLayout",
+                            elements: Object.keys(schemaResult.properties || {}).map(key => ({
+                                type: "Control",
+                                scope: `#/properties/${key}`
+                            }))
+                        };
+                    } catch (err) {
+                        error.value = err.message;
+                        console.error('Error loading schema:', err);
+                    }
+                });
+
+                const handleChange = (newData) => {
+                    data.value = newData;
+                    emit('form-change', newData);
+                };
+
+                const handleSubmit = () => {
+                    emit('form-submit', data.value);
+                };
+
+                return {
+                    schema,
+                    uischema,
+                    data,
+                    error,
+                    handleChange,
+                    handleSubmit
+                };
+            },
+            template: `
+                <div v-if="error" class="error">
+                    Failed to load schema: {{ error }}
+                </div>
+                <div v-else-if="schema">
+                    <json-forms
+                        :data="data"
+                        :schema="schema"
+                        :uischema="uischema"
+                        :renderers="renderers"
+                        @change="handleChange">
+                    </json-forms>
+                    <button @click="handleSubmit" style="margin-top: 15px; padding: 8px 16px;">
+                        Submit Form
+                    </button>
+                </div>
+                <div v-else>
+                    Loading schema for {{ messageType }}...
+                </div>
+            `
+        };
+
+        createApp({
+            components: {
+                'protobuf-form': ProtobufForm,
+                'json-forms': JSONFormsVue.JsonForms
+            },
+            setup() {
+                const pipeDocData = ref({
+                    docId: 'test-doc-123',
+                    title: 'Sample Document',
+                    body: 'This is a test document body with some content to demonstrate the form.',
+                    originalMimeType: 'text/plain'
+                });
+
+                const mappingRequestData = ref({
+                    document: {
+                        docId: 'mapping-test-456',
+                        title: 'Mapping Test Document',
+                        body: 'Document for testing mapping functionality.'
+                    },
+                    rules: []
+                });
+
+                const error = ref(null);
+                const renderers = JSONFormsVanillaRenderers.vanillaRenderers;
+
+                const onPipeDocChange = (newData) => {
+                    pipeDocData.value = newData;
+                    console.log('PipeDoc changed:', newData);
+                };
+
+                const onPipeDocSubmit = (data) => {
+                    console.log('PipeDoc submitted:', data);
+                    alert('PipeDoc form submitted! Check console for details.');
+                };
+
+                const onMappingRequestChange = (newData) => {
+                    mappingRequestData.value = newData;
+                    console.log('ApplyMappingRequest changed:', newData);
+                };
+
+                const onMappingRequestSubmit = (data) => {
+                    console.log('ApplyMappingRequest submitted:', data);
+                    alert('ApplyMappingRequest form submitted! Check console for details.');
+                };
+
+                return {
+                    pipeDocData,
+                    mappingRequestData,
+                    error,
+                    renderers,
+                    onPipeDocChange,
+                    onPipeDocSubmit,
+                    onMappingRequestChange,
+                    onMappingRequestSubmit
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

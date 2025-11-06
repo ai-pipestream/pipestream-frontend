@@ -1,0 +1,20 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "include": [
+    "src/**/*",
+    "src/**/*.vue"
+  ],
+  "compilerOptions": {
+    "ignoreDeprecations": "5.0",
+    "verbatimModuleSyntax": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@pipeline/proto-stubs/generated/*": [
+        "node_modules/@pipeline/proto-stubs/src/generated/*"
+      ]
+    }
+  }
+}

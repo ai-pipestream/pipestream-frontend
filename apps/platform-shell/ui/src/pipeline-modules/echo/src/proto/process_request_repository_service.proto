@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package io.pipeline.repository.v1;
+
+import "repository_service_data.proto";
+import "module_service.proto";
+import "pipeline_core_types.proto";
+
+option java_package = "io.pipeline.repository.v1";
+option java_multiple_files = true;
+
+// ============================================================================
+// PROCESS REQUEST REPOSITORY SERVICE
+// ============================================================================
+
+// Service for managing ProcessRequest and ProcessResponse storage for testing and simulation
+service ProcessRequestRepositoryService {
+  // ========== RAW PROCESS REQUEST OPERATIONS ==========
+  rpc CreateProcessRequest(CreateProcessRequestRequest) returns (CreateProcessRequestResponse);
+  rpc GetProcessRequest(GetProcessRequestRequest) returns (io.pipeline.data.module.ModuleProcessRequest);
+  rpc UpdateProcessRequest(UpdateProcessRequestRequest) returns (io.pipeline.data.module.ModuleProcessRequest);
+  rpc DeleteProcessRequest(DeleteProcessRequestRequest) returns (DeleteResponse);
+  rpc ListProcessRequests(ListProcessRequestsRequest) returns (ListProcessRequestsResponse);
+  
+  // ========== STORED PROCESS REQUEST OPERATIONS (with metadata) ==========
+  rpc CreateStoredProcessRequest(CreateProcessRequestRequest) returns (CreateStoredProcessRequestResponse);
+  rpc GetStoredProcessRequest(GetProcessRequestRequest) returns (StoredProcessRequest);
+  rpc UpdateStoredProcessRequest(UpdateProcessRequestRequest) returns (StoredProcessRequest);
+  rpc DeleteStoredProcessRequest(DeleteProcessRequestRequest) returns (DeleteResponse);
+  rpc ListStoredProcessRequests(ListProcessRequestsRequest) returns (ListStoredProcessRequestsResponse);
+  
+  // ========== RAW PROCESS RESPONSE OPERATIONS ==========
+  rpc CreateProcessResponse(CreateProcessResponseRequest) returns (CreateProcessResponseResponse);
+  rpc GetProcessResponse(GetProcessResponseRequest) returns (io.pipeline.data.module.ModuleProcessResponse);
+  rpc UpdateProcessResponse(UpdateProcessResponseRequest) returns (io.pipeline.data.module.ModuleProcessResponse);
+  rpc DeleteProcessResponse(DeleteProcessResponseRequest) returns (DeleteResponse);
+  rpc ListProcessResponses(ListProcessResponsesRequest) returns (ListProcessResponsesResponse);
+  
+  // ========== STORED PROCESS RESPONSE OPERATIONS (with metadata) ==========
+  rpc CreateStoredProcessResponse(CreateProcessResponseRequest) returns (CreateStoredProcessResponseResponse);
+  rpc GetStoredProcessResponse(GetProcessResponseRequest) returns (StoredProcessResponse);
+  rpc UpdateStoredProcessResponse(UpdateProcessResponseRequest) returns (StoredProcessResponse);
+  rpc DeleteStoredProcessResponse(DeleteProcessResponseRequest) returns (DeleteResponse);
+  rpc ListStoredProcessResponses(ListProcessResponsesRequest) returns (ListStoredProcessResponsesResponse);
+  
+  // ========== EXPORT/IMPORT OPERATIONS ==========
+  rpc ExportProcessRequests(ExportProcessRequestsRequest) returns (stream ExportChunk);
+  rpc ImportProcessRequests(stream ImportChunk) returns (ImportResponse);
+  rpc ExportProcessResponses(ExportProcessResponsesRequest) returns (stream ExportChunk);
+  rpc ImportProcessResponses(stream ImportChunk) returns (ImportResponse);
+  
+  // ========== REPOSITORY MANAGEMENT ==========
+  rpc FormatProcessRequestRepository(FormatRepositoryRequest) returns (FormatRepositoryResponse);
+}
+
+// ============================================================================
+// PROCESS REQUEST MESSAGES
+// ============================================================================
+
+// Create ProcessRequest request
+message CreateProcessRequestRequest {
+  io.pipeline.data.module.ModuleProcessRequest process_request = 1;
+  optional string name = 2; // Optional human-readable name for this test case
+  optional string description = 3; // Optional description of what this test case validates
+  optional io.pipeline.data.v1.Tags tags = 4; // Optional tags for categorization
+}
+
+// Create ProcessRequest response (raw version)
+message CreateProcessRequestResponse {
+  string storage_id = 1;
+}
+
+// Create stored ProcessRequest response (with metadata)
+message CreateStoredProcessRequestResponse {
+  string storage_id = 1;
+  StoredProcessRequest stored_request = 2;
+}
+
+// Get ProcessRequest request
+message GetProcessRequestRequest {
+  string storage_id = 1;
+}
+
+// Update ProcessRequest request
+message UpdateProcessRequestRequest {
+  string storage_id = 1;
+  io.pipeline.data.module.ModuleProcessRequest process_request = 2;
+  optional string name = 3; // Optional human-readable name for this test case
+  optional string description = 4; // Optional description of what this test case validates
+  optional io.pipeline.data.v1.Tags tags = 5; // Optional tags for categorization
+}
+
+// Delete ProcessRequest request
+message DeleteProcessRequestRequest {
+  string storage_id = 1;
+}
+
+// List ProcessRequests request
+message ListProcessRequestsRequest {
+  PaginationRequest pagination = 1;
+}
+
+// List ProcessRequests response (raw version)
+message ListProcessRequestsResponse {
+  repeated io.pipeline.data.module.ModuleProcessRequest process_requests = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// List stored ProcessRequests response (with metadata)
+message ListStoredProcessRequestsResponse {
+  repeated StoredProcessRequest stored_requests = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// Export ProcessRequests request
+message ExportProcessRequestsRequest {
+  repeated string request_ids = 1; // Specific IDs (empty = export all)
+  string filter = 2; // Simple filter
+  ExportFormat format = 3; // Export format
+}
+
+// ============================================================================
+// PROCESS RESPONSE MESSAGES
+// ============================================================================
+
+// Create ProcessResponse request
+message CreateProcessResponseRequest {
+  io.pipeline.data.module.ModuleProcessResponse process_response = 1;
+  optional string name = 2; // Optional human-readable name for this test case
+  optional string description = 3; // Optional description of what this test case validates
+  optional io.pipeline.data.v1.Tags tags = 4; // Optional tags for categorization
+}
+
+// Create ProcessResponse response (raw version)
+message CreateProcessResponseResponse {
+  string storage_id = 1;
+}
+
+// Create stored ProcessResponse response (with metadata)
+message CreateStoredProcessResponseResponse {
+  string storage_id = 1;
+  StoredProcessResponse stored_response = 2;
+}
+
+// Get ProcessResponse request
+message GetProcessResponseRequest {
+  string storage_id = 1;
+}
+
+// Update ProcessResponse request
+message UpdateProcessResponseRequest {
+  string storage_id = 1;
+  io.pipeline.data.module.ModuleProcessResponse process_response = 2;
+  optional string name = 3; // Optional human-readable name for this test case
+  optional string description = 4; // Optional description of what this test case validates
+  optional io.pipeline.data.v1.Tags tags = 5; // Optional tags for categorization
+}
+
+// Delete ProcessResponse request
+message DeleteProcessResponseRequest {
+  string storage_id = 1;
+}
+
+// List ProcessResponses request
+message ListProcessResponsesRequest {
+  PaginationRequest pagination = 1;
+}
+
+// List ProcessResponses response (raw version)
+message ListProcessResponsesResponse {
+  repeated io.pipeline.data.module.ModuleProcessResponse process_responses = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// List stored ProcessResponses response (with metadata)
+message ListStoredProcessResponsesResponse {
+  repeated StoredProcessResponse stored_responses = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// Export ProcessResponses request
+message ExportProcessResponsesRequest {
+  repeated string response_ids = 1; // Specific IDs (empty = export all)
+  string filter = 2; // Simple filter
+  ExportFormat format = 3; // Export format
+}

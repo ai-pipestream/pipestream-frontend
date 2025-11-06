@@ -1,0 +1,12 @@
+version: v2
+managed:
+  enabled: true
+plugins:
+  - local: protoc-gen-es
+    out: src/generated
+    opt:
+      - target=ts
+inputs:
+  - directory: proto
+  - module: buf.build/grpc/grpc
+  - module: buf.build/googleapis/googleapis

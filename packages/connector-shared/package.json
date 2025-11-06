@@ -1,0 +1,76 @@
+{
+  "name": "@io-pipeline/connector-shared",
+  "version": "1.0.0",
+  "description": "Backend utilities for connector functionality including streaming protocols, upload clients, and document processing",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./browser": {
+      "import": "./dist/browser.js",
+      "types": "./dist/browser.d.ts"
+    },
+    "./api": {
+      "import": "./dist/api.js",
+      "types": "./dist/api.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.js",
+      "types": "./dist/utils.d.ts"
+    }
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "test": "echo 'No tests yet'",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "directory": "packages/connector-shared"
+  },
+  "bugs": {
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+  },
+  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries#readme",
+  "license": "Apache-2.0",
+  "author": "Pipeline Team",
+  "keywords": [
+    "pipeline",
+    "connector",
+    "streaming",
+    "upload",
+    "document-processing"
+  ],
+  "publishConfig": {
+    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.6.3",
+    "@connectrpc/connect": "^2.0.3",
+    "@connectrpc/connect-web": "^2.0.3",
+    "@connectrpc/connect-node": "^2.1.0",
+    "@io-pipeline/grpc-stubs": "1.0.9",
+    "chalk": "^5.6.2",
+    "mime-types": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/mime-types": "^3.0.1",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=22.0.0 <23",
+    "pnpm": ">=10 <11"
+  }
+}

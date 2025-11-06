@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package io.pipeline.repository.v1;
+
+import "repository_service_data.proto";
+import "pipeline_config_models.proto";
+import "google/protobuf/struct.proto";
+
+option java_package = "io.pipeline.repository.v1";
+option java_multiple_files = true;
+
+// ============================================================================
+// MODULE REPOSITORY SERVICE
+// ============================================================================
+
+// Service for managing module definitions and configurations
+service ModuleRepositoryService {
+  // ========== MODULE OPERATIONS ==========
+  rpc CreateModule(CreateModuleRequest) returns (io.pipeline.config.v1.ModuleDefinition);
+  rpc GetModule(GetModuleRequest) returns (io.pipeline.config.v1.ModuleDefinition);
+  rpc UpdateModule(UpdateModuleRequest) returns (io.pipeline.config.v1.ModuleDefinition);
+  rpc DeleteModule(DeleteModuleRequest) returns (DeleteResponse);
+  rpc ListModules(ListModulesRequest) returns (ListModulesResponse);
+  
+  // ========== MODULE DISCOVERY ==========
+  rpc FindModulesByType(FindModulesByTypeRequest) returns (FindModulesByTypeResponse);
+  rpc FindModulesByVisibility(FindModulesByVisibilityRequest) returns (FindModulesByVisibilityResponse);
+  
+  // ========== EXPORT/IMPORT OPERATIONS ==========
+  rpc ExportModules(ExportModulesRequest) returns (stream ExportChunk);
+  rpc ImportModules(stream ImportChunk) returns (ImportResponse);
+  
+  // ========== REPOSITORY MANAGEMENT ==========
+  rpc FormatModuleRepository(FormatRepositoryRequest) returns (FormatRepositoryResponse);
+}
+
+// ============================================================================
+// MODULE REQUEST/RESPONSE MESSAGES
+// ============================================================================
+
+// Create Module request
+message CreateModuleRequest {
+  string implementation_name = 1;
+  string grpc_service_name = 2;
+  io.pipeline.config.v1.SchemaReference config_schema = 3;
+  google.protobuf.Struct default_config = 4;
+  io.pipeline.config.v1.ModuleVisibility visibility = 5;
+}
+
+// Get Module request
+message GetModuleRequest {
+  string module_id = 1;
+}
+
+// Update Module request
+message UpdateModuleRequest {
+  string module_id = 1;
+  string implementation_name = 2;
+  io.pipeline.config.v1.SchemaReference config_schema = 3;
+  google.protobuf.Struct default_config = 4;
+  io.pipeline.config.v1.ModuleVisibility visibility = 5;
+}
+
+// Delete Module request
+message DeleteModuleRequest {
+  string module_id = 1;
+}
+
+// List Modules request
+message ListModulesRequest {
+  io.pipeline.config.v1.ModuleVisibility visibility = 1; // Optional filter
+  PaginationRequest pagination = 2;
+}
+
+// List Modules response
+message ListModulesResponse {
+  repeated io.pipeline.config.v1.ModuleDefinition modules = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// ============================================================================
+// MODULE DISCOVERY MESSAGES
+// ============================================================================
+
+// Find Modules by Type request
+message FindModulesByTypeRequest {
+  string module_type = 1; // e.g., "parser", "chunker", "embedder"
+  PaginationRequest pagination = 2;
+}
+
+// Find Modules by Type response
+message FindModulesByTypeResponse {
+  repeated io.pipeline.config.v1.ModuleDefinition modules = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// Find Modules by Visibility request
+message FindModulesByVisibilityRequest {
+  io.pipeline.config.v1.ModuleVisibility visibility = 1;
+  PaginationRequest pagination = 2;
+}
+
+// Find Modules by Visibility response
+message FindModulesByVisibilityResponse {
+  repeated io.pipeline.config.v1.ModuleDefinition modules = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// ============================================================================
+// EXPORT/IMPORT MESSAGES
+// ============================================================================
+
+// Export Modules request
+message ExportModulesRequest {
+  repeated string module_ids = 1; // Specific IDs (empty = export all)
+  string filter = 2; // Simple filter
+  ExportFormat format = 3; // Export format
+}

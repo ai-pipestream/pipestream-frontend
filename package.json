@@ -1,0 +1,19 @@
+{
+  "name": "@io-pipeline/platform-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend monorepo for IO Pipeline platform applications",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "keywords": ["monorepo", "frontend", "io-pipeline"],
+  "author": "IO Pipeline",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+# Node build artifacts
+/node_modules/
+/dist/
+
+# Protobuf sources and generated stubs (synced/generated at build time)
+/proto/
+/src/generated/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

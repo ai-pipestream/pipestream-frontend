@@ -1,0 +1,233 @@
+import express from 'express';
+import cors from 'cors';
+import { resolve, join } from 'node:path';
+import { expressConnectMiddleware } from "@connectrpc/connect-express";
+import { createClient } from "@connectrpc/connect";
+import { createGrpcTransport } from "@connectrpc/connect-node";
+import { Health } from "./generated/grpc/health/v1/health_pb.js";
+import { PlatformRegistration } from "./generated/registration/platform_registration_pb.js";
+import { createDynamicTransport } from './lib/serviceResolver.js';
+import connectRoutes from './routes/connectRoutes.js';
+
+const app = express();
+const PORT = process.env.PORT || 38106;
+// Resolve public dir relative to the working directory (script cds into app dir)
+const publicDir = resolve(process.cwd(), 'public');
+
+// Middleware
+app.use(cors());
+
+// Normalize legacy/generic gRPC content-types to Connect for /connect routes
+app.use('/connect', (req, _res, next) => {
+    const ct = req.headers['content-type']?.toString().toLowerCase();
+    if (!ct) {
+        // Default to JSON if missing
+        req.headers['content-type'] = 'application/connect+json';
+    } else if (ct === 'application/json') {
+        req.headers['content-type'] = 'application/connect+json';
+    } else if (
+        ct === 'application/proto' ||
+        ct === 'application/grpc' ||
+        ct.startsWith('application/grpc-web') ||
+        ct === 'application/octet-stream'
+    ) {
+        // Rewrite to Connect binary content-type so connect-express handles it
+        req.headers['content-type'] = 'application/connect+proto';
+    }
+
+    const acc = req.headers['accept']?.toString().toLowerCase();
+    if (acc === 'application/json') {
+        req.headers['accept'] = 'application/connect+json';
+    } else if (
+        acc === 'application/proto' ||
+        acc === 'application/grpc' ||
+        acc?.startsWith('application/grpc-web')
+    ) {
+        req.headers['accept'] = 'application/connect+proto';
+    }
+    if (!req.headers['connect-protocol-version']) {
+        req.headers['connect-protocol-version'] = '1';
+    }
+    
+    // Debug logging
+    console.log('[Connect] Request:', req.method, req.path);
+    console.log('[Connect] Content-Type:', req.headers['content-type']);
+    console.log('[Connect] Accept:', req.headers['accept']);
+    console.log('[Connect] Connect-Protocol-Version:', req.headers['connect-protocol-version']);
+    
+    next();
+});
+
+// Internal proxy health endpoint (moved off /health to avoid UI route collision)
+app.get('/proxy/health', (req, res) => {
+    res.json({ 
+        status: 'healthy', 
+        service: 'web-proxy',
+        timestamp: new Date().toISOString() 
+    });
+});
+
+// Serve static assets for the Platform Shell (if present)
+app.use(express.static(publicDir));
+
+// Temporary JSON endpoint for shared navigation items
+// When SystemNavService is implemented, replace this with the RPC
+app.get('/connect/system-nav/menu-items.json', async (req, res) => {
+    // Determine the base URL for common pages (web-proxy serves these)
+    const protocol = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http')
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:38106'
+    const baseUrl = `${protocol}://${host}`
+    
+    const coreItems = [
+        { title: 'Home', icon: 'mdi-home', to: '/' },
+        { title: 'Health', icon: 'mdi-heart-pulse', to: '/health' },
+        { title: 'Components', icon: 'mdi-palette', to: '/components' },
+        { title: 'Mapping', icon: 'mdi-code-braces', to: '/mapping' },
+        { title: 'Links', icon: 'mdi-link-variant', to: '/links' },
+    ];
+
+    try {
+        const REGISTRATION_HOST = process.env.PLATFORM_REGISTRATION_HOST || 'localhost';
+        const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '38101';
+        const REGISTRATION_URL = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
+        const transport = createGrpcTransport({ baseUrl: REGISTRATION_URL, idleConnectionTimeoutMs: 1000 * 60 * 60 });
+        const client = createClient(PlatformRegistration, transport);
+
+        const [servicesResp, modulesResp] = await Promise.all([
+            client.listServices({} as any),
+            client.listModules({} as any)
+        ]);
+
+        const SERVICE_UI_PATH: Record<string, string> = {
+            'platform-registration-service': '/platform-registration/',
+            // Ensure trailing slash to avoid 404 when omitted
+            'repository-service': '/repository/',
+            'opensearch-manager': '/opensearch-manager/',
+            'mapping-service': '/mapping-service/',
+            'consul': 'http://localhost:8500', // external UI
+        };
+
+        // Optionally mark items disabled when service is not resolvable
+        const resolvable = new Set<string>();
+        try {
+            for (const s of servicesResp.services ?? []) {
+                const name = (s as any).serviceName as string;
+                try {
+                    if (name !== 'consul') {
+                        await createDynamicTransport(name); // will throw if not resolvable
+                    }
+                    resolvable.add(name);
+                } catch {}
+            }
+        } catch {}
+
+        const serviceItems = (servicesResp.services ?? []).map((s: any) => {
+            const name = s.serviceName as string;
+            const to = SERVICE_UI_PATH[name] || `/${name}`;
+            const isExternal = to.startsWith('http');
+            const item: any = {
+                title: name,
+                icon: name === 'consul' ? 'mdi-server' : 'mdi-cube',
+            };
+            if (isExternal) {
+                item.href = to; item.external = true;
+            } else {
+                item.to = to; item.disabled = !resolvable.has(name);
+            }
+            return item;
+        });
+
+        const moduleItems = (modulesResp.modules ?? []).map((m: any) => ({
+            title: m.moduleName || m.serviceName || 'module',
+            icon: 'mdi-puzzle',
+            to: `/modules/${m.moduleName || m.serviceName}`,
+        }));
+
+        res.json([...coreItems, ...serviceItems, ...moduleItems]);
+    } catch (e) {
+        console.warn('[Nav] Falling back to static nav items:', e);
+        res.json([
+            ...coreItems,
+            { title: 'Repository', icon: 'mdi-database', to: '/repository' },
+            { title: 'Platform Registration', icon: 'mdi-account-cog', to: '/platform-registration' }
+        ]);
+    }
+});
+
+// Simple health snapshot aggregator
+app.get('/connect/system/health-snapshot', async (req, res) => {
+    const servicesToCheck = [
+        'platform-registration-service',
+        'repository-service',
+        'mapping-service',
+        'opensearch-manager'
+    ];
+
+    // Platform registration fixed location
+    const REGISTRATION_HOST = process.env.PLATFORM_REGISTRATION_HOST || 'localhost';
+    const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '38101';
+    const REGISTRATION_URL = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
+
+    async function checkService(serviceName: string) {
+        let transport;
+        let target = '';
+        try {
+            if (serviceName === 'platform-registration-service') {
+                transport = createGrpcTransport({ baseUrl: REGISTRATION_URL, idleConnectionTimeoutMs: 1000 * 60 * 60 });
+                target = REGISTRATION_URL;
+            } else {
+                transport = await createDynamicTransport(serviceName);
+                // createDynamicTransport encodes target in its internal options, but we also try to expose it
+                target = 'dynamic';
+            }
+            const client = createClient(Health, transport);
+            const response = await client.check({});
+            return { name: serviceName, status: String(response.status), target, error: null };
+        } catch (err: any) {
+            return { name: serviceName, status: 'UNKNOWN', target, error: err?.message ?? String(err) };
+        }
+    }
+
+    try {
+        const results = await Promise.all(servicesToCheck.map(checkService));
+        res.json({ services: results, checkedAt: new Date().toISOString() });
+    } catch (e: any) {
+        res.status(500).json({ error: e?.message ?? String(e) });
+    }
+});
+
+// Mount Connect routes
+app.use(
+    expressConnectMiddleware({
+        routes: connectRoutes,
+        requestPathPrefix: "/connect",
+    })
+);
+
+// SPA fallback: serve index.html for non-API routes
+// Exclude only Connect API and the internal proxy health endpoint
+app.get(/^(?!\/connect|\/proxy\/health).*/, (req, res) => {
+    res.sendFile(join(publicDir, 'index.html'));
+});
+
+// Start server
+async function startServer() {
+    try {
+        app.listen(PORT, () => {
+            console.log(`Web proxy backend listening at http://localhost:${PORT}`);
+            console.log(`Connect API available at: http://localhost:${PORT}/connect`);
+            console.log(`Health check: http://localhost:${PORT}/proxy/health`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log('\nShutting down gracefully...');
+    process.exit(0);
+});
+
+startServer();

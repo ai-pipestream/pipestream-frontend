@@ -1,0 +1,69 @@
+{
+  "name": "@io-pipeline/shared-nav",
+  "version": "1.0.0",
+  "description": "Navigation shell components (AppShell, Drawer, AppBar) for Pipeline platform frontends",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "test": "echo 'No tests yet'",
+    "typecheck": "echo 'Type checking disabled until grpc-stubs@1.0.0 published'",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "directory": "packages/shared-nav"
+  },
+  "bugs": {
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+  },
+  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries/tree/main/packages/shared-nav#readme",
+  "license": "Apache-2.0",
+  "author": "Pipeline Team",
+  "keywords": [
+    "vue",
+    "vuetify",
+    "navigation",
+    "shell",
+    "pipeline",
+    "ui-components"
+  ],
+  "publishConfig": {
+    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+  },
+  "dependencies": {
+    "@io-pipeline/grpc-stubs": "1.0.9",
+    "vue": "^3.5.18"
+  },
+  "peerDependencies": {
+    "vuetify": "^3.9.3"
+  },
+  "devDependencies": {
+    "vuetify": "^3.9.3",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vue-tsc": "^3.0.5"
+  },
+  "engines": {
+    "node": ">=22.0.0 <23",
+    "pnpm": ">=10 <11"
+  }
+}

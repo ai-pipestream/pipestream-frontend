@@ -1,0 +1,65 @@
+{
+  "name": "@io-pipeline/platform-shell",
+  "version": "1.0.0",
+  "description": "Platform Shell - Unified web frontend and Connect-ES proxy for Pipeline Engine services",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "tsc --skipLibCheck --noEmitOnError false",
+    "build:ui": "cd ui && pnpm run build",
+    "build:all": "pnpm run build && pnpm run build:ui",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test:upload:dev": "tsx scripts/test-upload-chunks.ts",
+    "start:dev": "tsx src/index.ts",
+    "docker:build": "docker build -t io-pipeline/platform-shell .",
+    "docker:run": "docker run -p 38106:38106 io-pipeline/platform-shell",
+    "docker:compose": "docker-compose up -d",
+    "dev:all": "concurrently \"pnpm run dev\" \"pnpm run dev:ui\"",
+    "dev:backend": "tsx watch src/index.ts",
+    "dev:ui": "cd ui && pnpm run dev"
+  },
+  "keywords": [
+    "pipeline",
+    "platform",
+    "frontend",
+    "connect-es",
+    "vue"
+  ],
+  "author": "Pipeline Team",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://git.rokkon.com/io-pipeline/platform-shell.git"
+  },
+  "bugs": {
+    "url": "https://git.rokkon.com/io-pipeline/platform-shell/issues"
+  },
+  "homepage": "https://git.rokkon.com/io-pipeline/platform-shell#readme",
+  "dependencies": {
+    "@bufbuild/protobuf": "latest",
+    "@connectrpc/connect": "latest",
+    "@connectrpc/connect-express": "^2.1.0",
+    "@connectrpc/connect-node": "^2.1.0",
+    "@io-pipeline/grpc-stubs": "1.0.9",
+    "@io-pipeline/connector-shared": "workspace:*",
+    "@io-pipeline/protobuf-forms": "workspace:*",
+    "@types/multer": "^2.0.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "tsx": "^4.20.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.2.0",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=22.0.0 <23",
+    "pnpm": ">=10 <11"
+  }
+}

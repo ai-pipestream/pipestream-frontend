@@ -1,0 +1,76 @@
+{
+  "name": "@io-pipeline/protobuf-forms",
+  "version": "1.0.0",
+  "description": "Type-safe form generation from Protocol Buffer messages using JSONForms",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./vue": {
+      "import": "./src/vue.ts",
+      "types": "./src/vue.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist src/generated proto",
+    "dev": "tsup --watch",
+    "test": "echo 'No tests yet'",
+    "typecheck": "echo 'Type checking skipped - Vue components not included in build'",
+    "proto:sync": "echo 'Proto sync not needed in published package'",
+    "proto:generate": "echo 'Proto generation not needed in published package'",
+    "prepublishOnly": "pnpm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "directory": "packages/protobuf-forms"
+  },
+  "bugs": {
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+  },
+  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries/tree/main/packages/protobuf-forms#readme",
+  "license": "Apache-2.0",
+  "author": "Pipeline Team",
+  "keywords": [
+    "protobuf",
+    "forms",
+    "jsonforms",
+    "vue",
+    "type-safe",
+    "pipeline"
+  ],
+  "publishConfig": {
+    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.7.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.56.0",
+    "@bufbuild/protoc-gen-es": "^2.7.0",
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "peerDependencies": {
+    "@jsonforms/core": "^3.7.0-alpha.2",
+    "@jsonforms/vue": "^3.7.0-alpha.2",
+    "@jsonforms/vue-vuetify": "^3.7.0-alpha.2",
+    "vue": "^3.4.0"
+  },
+  "engines": {
+    "node": ">=22.0.0 <23",
+    "pnpm": ">=10 <11"
+  }
+}

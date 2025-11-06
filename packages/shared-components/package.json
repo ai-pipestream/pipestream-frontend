@@ -1,0 +1,76 @@
+{
+  "name": "@io-pipeline/shared-components",
+  "version": "1.0.7",
+  "description": "Vue 3 + Vuetify 3 UI components library including ComponentGallery for Pipeline platform frontends",
+  "type": "module",
+  "main": "./dist/pipeline-shared-components.js",
+  "module": "./dist/pipeline-shared-components.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/pipeline-shared-components.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "test": "echo 'No tests yet'",
+    "typecheck": "echo 'Type checking disabled until grpc-stubs@1.0.0 published'",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "directory": "packages/shared-components"
+  },
+  "bugs": {
+    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+  },
+  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries/tree/main/packages/shared-components#readme",
+  "license": "Apache-2.0",
+  "author": "Pipeline Team",
+  "keywords": [
+    "vue",
+    "vuetify",
+    "components",
+    "pipeline",
+    "ui-library",
+    "component-gallery"
+  ],
+  "publishConfig": {
+    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "latest",
+    "@connectrpc/connect": "^2.1.0",
+    "@connectrpc/connect-web": "^2.1.0",
+    "@io-pipeline/grpc-stubs": "1.0.9",
+    "@jsonforms/core": "^3.7.0-alpha.2",
+    "@jsonforms/vue": "^3.7.0-alpha.2",
+    "@jsonforms/vue-vuetify": "^3.7.0-alpha.2",
+    "vue": "^3.5.18"
+  },
+  "peerDependencies": {
+    "vuetify": "^3.9.3"
+  },
+  "devDependencies": {
+    "vuetify": "^3.9.3",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vue-tsc": "^3.0.5"
+  },
+  "engines": {
+    "node": ">=22.0.0 <23",
+    "pnpm": ">=10 <11"
+  }
+}

@@ -1,0 +1,81 @@
+import Consul from 'consul';
+
+// Get configuration from environment
+const CONSUL_HOST = process.env.CONSUL_HOST || 'localhost';
+const CONSUL_PORT = process.env.CONSUL_PORT || '8500';
+const SERVICE_NAME = process.env.SERVICE_NAME || 'web-proxy';
+const SERVICE_HOST = process.env.SERVICE_HOST || 'localhost';
+const SERVICE_PORT = parseInt(process.env.PORT || '38106');
+const SERVICE_ID = `${SERVICE_NAME}-${SERVICE_HOST}-${SERVICE_PORT}`;
+
+// Create Consul client
+const consul = new Consul({
+  host: CONSUL_HOST,
+  port: CONSUL_PORT,
+  promisify: true
+});
+
+/**
+ * Register the web-proxy service with Consul
+ */
+export async function registerWithConsul(): Promise<void> {
+  try {
+    const registration = {
+      id: SERVICE_ID,
+      name: SERVICE_NAME,
+      address: SERVICE_HOST,
+      port: SERVICE_PORT,
+      tags: ['grpc-web', 'proxy', 'frontend-bridge'],
+      check: {
+        http: `http://${SERVICE_HOST}:${SERVICE_PORT}/health`,
+        interval: '10s',
+        timeout: '5s',
+        deregister_critical_service_after: '30s'
+      },
+      meta: {
+        version: '1.0.0',
+        protocol: 'grpc-web'
+      }
+    };
+
+    await consul.agent.service.register(registration);
+    console.log(`[Consul] Registered ${SERVICE_NAME} with ID ${SERVICE_ID}`);
+    console.log(`[Consul] Service available at ${SERVICE_HOST}:${SERVICE_PORT}`);
+
+    // Setup graceful shutdown
+    process.on('SIGINT', () => deregisterFromConsul());
+    process.on('SIGTERM', () => deregisterFromConsul());
+    
+  } catch (error) {
+    console.error('[Consul] Failed to register with Consul:', error);
+    // Don't fail the service if Consul isn't available
+    console.log('[Consul] Continuing without Consul registration');
+  }
+}
+
+/**
+ * Deregister the service from Consul
+ */
+export async function deregisterFromConsul(): Promise<void> {
+  try {
+    await consul.agent.service.deregister(SERVICE_ID);
+    console.log(`[Consul] Deregistered ${SERVICE_NAME}`);
+    process.exit(0);
+  } catch (error) {
+    console.error('[Consul] Failed to deregister:', error);
+    process.exit(1);
+  }
+}
+
+/**
+ * Periodically update health check with Consul
+ */
+export function startHealthCheckUpdates(): void {
+  setInterval(async () => {
+    try {
+      await consul.agent.check.pass(`service:${SERVICE_ID}`);
+    } catch (error) {
+      console.error('[Consul] Failed to update health check:', error);
+    }
+  }, 5000); // Update every 5 seconds
+}

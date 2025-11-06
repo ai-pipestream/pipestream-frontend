@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package io.pipeline.repository.v1;
+
+import "pipeline_core_types.proto";
+import "module_service.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_package = "io.pipeline.repository.v1";
+option java_multiple_files = true;
+
+// ============================================================================
+// SHARED REPOSITORY DATA TYPES
+// ============================================================================
+
+// Repository-specific data models for storing documents with metadata
+message StoredPipeDoc {
+  string storage_id = 1; // Repository-assigned ID
+  io.pipeline.data.v1.PipeDoc document = 2;
+  io.pipeline.data.v1.Tags tags = 3; // Repository tags for categorization
+  string description = 4; // Human-readable description
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+// Repository-specific data models for storing process requests with metadata
+message StoredProcessRequest {
+  string storage_id = 1; // Repository-assigned ID
+  io.pipeline.data.module.ModuleProcessRequest request = 2;
+  string name = 3; // Human-readable name for this test case
+  string description = 4; // Description of what this test case validates
+  io.pipeline.data.v1.Tags tags = 5; // Tags for categorization
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Repository-specific data models for storing process responses with metadata
+message StoredProcessResponse {
+  string storage_id = 1; // Repository-assigned ID
+  io.pipeline.data.module.ModuleProcessResponse response = 2;
+  string name = 3; // Human-readable name for this test case
+  string description = 4; // Description of what this test case validates
+  io.pipeline.data.v1.Tags tags = 5; // Tags for categorization
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// ============================================================================
+// SHARED REQUEST/RESPONSE PATTERNS
+// ============================================================================
+
+// Standard delete response pattern
+message DeleteResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Standard pagination request pattern
+message PaginationRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3; // Simple filter expression
+  string order_by = 4; // Ordering specification
+}
+
+// ============================================================================
+// EXPORT/IMPORT SHARED TYPES
+// ============================================================================
+
+// Export formats supported across services
+enum ExportFormat {
+  EXPORT_FORMAT_PROTOBUF = 0; // Primary: Binary .pb files
+  EXPORT_FORMAT_ZIP = 1;      // Bulk export with metadata
+}
+
+// Streaming export chunk
+message ExportChunk {
+  bytes data = 1;
+  int32 sequence_number = 2;
+  bool is_last = 3;
+  string content_type = 4;
+}
+
+// Streaming import chunk
+message ImportChunk {
+  bytes data = 1;
+  int32 sequence_number = 2;
+  bool is_last = 3;
+  ImportOptions options = 4;
+}
+
+// Import options
+message ImportOptions {
+  bool overwrite_existing = 1;
+  optional io.pipeline.data.v1.Tags default_tags = 2; // Default tags for imported items
+}
+
+// Import response
+message ImportResponse {
+  int32 total_imported = 1;
+  int32 total_updated = 2;
+  int32 total_failed = 3;
+  repeated ImportError errors = 4;
+}
+
+// Import error details
+message ImportError {
+  string item_name = 1;
+  string error_message = 2;
+  int32 line_number = 3;
+}
+
+// ============================================================================
+// BATCH OPERATIONS
+// ============================================================================
+
+// Batch operation result
+message BatchOperationResult {
+  string operation_id = 1;
+  bool success = 2;
+  string error_message = 3;
+  string resource_id = 4; // ID of created/updated resource
+}
+
+// ============================================================================
+// FORMAT/CLEANUP OPERATIONS
+// ============================================================================
+
+// Format repository request (for cleanup operations)
+message FormatRepositoryRequest {
+  string confirmation = 1; // Must be "DELETE_REPOSITORY_DATA" to proceed
+  bool include_documents = 2; // Delete stored PipeDocs
+  bool include_requests = 3; // Delete stored ProcessRequests
+  bool include_responses = 4; // Delete stored ProcessResponses
+  bool dry_run = 5; // If true, return what would be deleted without deleting
+}
+
+// Format repository response
+message FormatRepositoryResponse {
+  bool success = 1;
+  string message = 2;
+  int32 documents_deleted = 3;
+  int32 requests_deleted = 4;
+  int32 responses_deleted = 5;
+  repeated string deleted_ids = 6; // Storage IDs deleted (only populated if dry_run=true)
+}

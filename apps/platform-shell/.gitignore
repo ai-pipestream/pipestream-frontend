@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+public/assets/
+public/index.html
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.sw?
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+.npmrc.local
+
+# Testing
+coverage/
+
+# Temporary
+*.tmp
+*.temp
+.cache/
+
