@@ -6,9 +6,8 @@
  */
 
 import { createClient } from '@connectrpc/connect'
-import { createBinaryTransport } from '@ai-pipestream/grpc-stubs'
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/registration'
-import type { ServiceDetails, ServiceListResponse } from '@ai-pipestream/grpc-stubs/registration'
+import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+import type { ServiceDetails, ServiceListResponse } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
 
 // Service interface types
 export interface DiscoveredService {
@@ -61,7 +60,7 @@ export class ServiceDiscoveryClient {
     }
 
     // Create transport that routes to platform-registration service through Vite proxy
-    const transport = createBinaryTransport(this.options.platformRegistrationBaseUrl)
+    const transport = createConnectTransport(this.options.platformRegistrationBaseUrl)
 
     // Create the platform registration client
     this.platformRegistrationClient = createClient(PlatformRegistration, transport)

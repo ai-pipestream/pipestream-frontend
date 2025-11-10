@@ -73,8 +73,7 @@ import {
   MappingService, 
   ApplyMappingRequestSchema, 
   ApplyMappingResponseSchema,
-} from '@ai-pipestream/grpc-stubs/mapping'
-import { createBinaryTransport } from '@ai-pipestream/grpc-stubs'
+} from '@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb'
 import { PipeDocPreview } from '@ai-pipestream/shared-components'
 
 const loading = ref(false)
@@ -98,7 +97,7 @@ const sampleDocument = ref({
 })
 
 // Use the binary transport from proto-stubs - now using web-proxy
-const transport = createBinaryTransport()
+const transport = createConnectTransport()
 const client = createClient(MappingService, transport)
 
 async function callMappingService() {

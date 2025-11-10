@@ -165,8 +165,7 @@ import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDocumentStore } from '../stores/documentStore'
 import { createClient } from '@connectrpc/connect'
-import { createBinaryTransport } from '@ai-pipestream/grpc-stubs'
-import { FilesystemService } from '@ai-pipestream/grpc-stubs/repository/filesystem'
+import { FilesystemService } from '@ai-pipestream/grpc-stubs/dist/repository/filesystem/filesystem_service_pb'
 
 const props = defineProps<{
   initialQuery?: string
@@ -177,7 +176,7 @@ const documentStore = useDocumentStore()
 const { documents: searchResults, loading: searching, error } = storeToRefs(documentStore)
 
 // gRPC Client
-const transport = createBinaryTransport()
+const transport = createConnectTransport()
 const repoClient = createClient(FilesystemService, transport)
 
 // Local State
