@@ -61,7 +61,7 @@ corepack prepare pnpm@latest --activate
 # Install dependencies
 pnpm install
 
-# Build all packages
+# Build all packages (runs pnpm -r build recursively)
 pnpm build
 
 # Run Platform Shell in development mode
@@ -87,10 +87,14 @@ Access at: http://localhost:38106
 
 ## Docker
 
+The Dockerfile uses a multi-stage build process:
+1. **Builder stage**: Installs dependencies and runs `pnpm -r build` to build all packages recursively
+2. **Runtime stage**: Creates a minimal production image with only built artifacts and production dependencies
+
 ### Quick Run
 
 ```bash
-# Build the image
+# Build the image (must run from monorepo root)
 docker build -f apps/platform-shell/Dockerfile -t platform-shell .
 
 # Run the container
@@ -161,9 +165,12 @@ The platform gracefully handles service unavailability:
 
 ### Building Packages
 
+The build system automatically handles package dependencies in the correct order:
+
 ```bash
-# Build all packages
-pnpm -r build
+# Build all packages recursively (from monorepo root)
+# This runs: pnpm -r build
+pnpm build
 
 # Build specific package
 pnpm --filter @ai-pipestream/shared-components build
@@ -171,6 +178,8 @@ pnpm --filter @ai-pipestream/shared-components build
 # Watch mode for development
 pnpm --filter @ai-pipestream/shared-components dev
 ```
+
+**Note**: The `pnpm build` command in the root package.json executes `pnpm -r build`, which builds all packages recursively in dependency order. This is the same command used in the Dockerfile.
 
 ### Publishing
 
