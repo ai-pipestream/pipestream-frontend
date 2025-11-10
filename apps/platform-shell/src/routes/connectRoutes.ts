@@ -303,6 +303,13 @@ export default (router: ConnectRouter) => {
       for await (const event of client.watchServices(req)) {
         yield event;
       }
+    },
+    async *watchModules(req: any) {
+      console.log("[Connect] Proxying watchModules to platform-registration-service");
+      const client = createClient(PlatformRegistration, registrationTransport);
+      for await (const event of client.watchModules(req)) {
+        yield event;
+      }
     }
   });
 

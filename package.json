@@ -9,11 +9,18 @@
     "test": "pnpm -r test",
     "clean": "pnpm -r clean && rm -rf node_modules"
   },
-  "keywords": ["monorepo", "frontend", "ai-pipestream"],
+  "keywords": [
+    "monorepo",
+    "frontend",
+    "ai-pipestream"
+  ],
   "author": "IO Pipeline",
   "license": "MIT",
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
+  },
+  "dependencies": {
+    "@ai-pipestream/grpc-stubs": "0.1.6-alpha.20251110123501"
   }
 }

@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      '@ai-pipestream/grpc-stubs':
+        specifier: 0.1.6-alpha.20251110123501
+        version: 0.1.6-alpha.20251110123501
 
   apps/platform-shell:
     dependencies:
@@ -14,8 +18,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/connector-shared
       '@ai-pipestream/grpc-stubs':
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.1.6-alpha.20251110123501
+        version: 0.1.6-alpha.20251110123501
       '@ai-pipestream/protobuf-forms':
         specifier: workspace:*
         version: link:../../packages/protobuf-forms
@@ -69,8 +73,8 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/connector-shared
       '@ai-pipestream/grpc-stubs':
-        specifier: 0.1.6-alpha.0
-        version: 0.1.6-alpha.0
+        specifier: 0.1.6-alpha.20251110123501
+        version: 0.1.6-alpha.20251110123501
       '@ai-pipestream/protobuf-forms':
         specifier: workspace:*
         version: link:../../../packages/protobuf-forms
@@ -308,8 +312,8 @@ packages:
     resolution: {integrity: sha512-U03wmkx4jXVP4LpZwfmmoyqfUbet2RD1tr+c4f1H5rve8a+0yEpREAjXtRSJi+KMvtWs6ScRuRrdr16k8eLQcw==}
     engines: {node: '>=22.0.0 <23', pnpm: '>=10 <11'}
 
-  '@ai-pipestream/grpc-stubs@0.1.6-alpha.0':
-    resolution: {integrity: sha512-26o8iLuFdmhS9tMkB9YaTKQuUdEpA+7nv4Y5oWs/Ip2FDd+zXKUkOZUNkqFR3+WZ995hm2Wqkgi0Pxn0sHUR9Q==}
+  '@ai-pipestream/grpc-stubs@0.1.6-alpha.20251110123501':
+    resolution: {integrity: sha512-tXg4JtRxQEw2pv0dYlVwhpz3fragqay4Tflvzbnwz4gbCVCxNX2ATe2IErdVXOpSdC3aMeItz5eBF1KcB4DHUg==}
     engines: {node: '>=22.0.0 <23', pnpm: '>=10 <11'}
 
   '@babel/helper-string-parser@7.27.1':
@@ -2633,7 +2637,7 @@ snapshots:
       '@connectrpc/connect': 2.1.0(@bufbuild/protobuf@2.10.0)
       '@connectrpc/connect-web': 2.1.0(@bufbuild/protobuf@2.10.0)(@connectrpc/connect@2.1.0(@bufbuild/protobuf@2.10.0))
 
-  '@ai-pipestream/grpc-stubs@0.1.6-alpha.0':
+  '@ai-pipestream/grpc-stubs@0.1.6-alpha.20251110123501':
     dependencies:
       '@bufbuild/protobuf': 2.10.0
       '@connectrpc/connect': 2.1.0(@bufbuild/protobuf@2.10.0)

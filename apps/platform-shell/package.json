@@ -42,7 +42,7 @@
     "@connectrpc/connect": "latest",
     "@connectrpc/connect-express": "^2.1.0",
     "@connectrpc/connect-node": "^2.1.0",
-    "@ai-pipestream/grpc-stubs": "0.1.2",
+    "@ai-pipestream/grpc-stubs": "0.1.6-alpha.20251110123501",
     "@ai-pipestream/connector-shared": "workspace:*",
     "@ai-pipestream/protobuf-forms": "workspace:*",
     "@types/multer": "^2.0.0",

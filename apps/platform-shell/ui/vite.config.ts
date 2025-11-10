@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       exclude: ['@ai-pipestream/grpc-stubs'],
+      force: true,  // Force re-optimization on server start
       esbuildOptions: {
         target: 'es2020',
       },

@@ -1,22 +1,37 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { createClient } from '@connectrpc/connect'
+import { createClient, ConnectError, Code } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb.ts'
+
+console.log('[ServiceRegistry] Loaded PlatformRegistration service descriptor:', PlatformRegistration)
+console.log('[ServiceRegistry] Service methods:', PlatformRegistration.methods)
+console.log('[ServiceRegistry] Method names:', Object.keys(PlatformRegistration.methods))
+console.log('[ServiceRegistry] Raw methods object:', PlatformRegistration.methods)
 
 export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
   // State
   const availableServices = ref<Set<string>>(new Set())
   const availableModules = ref<Set<string>>(new Set())
 
-  // Polling intervals
-  let serviceInterval: ReturnType<typeof setInterval> | null = null
-  let moduleInterval: ReturnType<typeof setInterval> | null = null
+  // Stream state
+  let serviceAbortController: AbortController | null = null
+  let moduleAbortController: AbortController | null = null
   let isInitialized = false
+  let isUnmounted = false
 
-  // Fetch services (polling)
-  const fetchServices = async () => {
+  // Watch services (streaming)
+  const startServiceStream = async (): Promise<void> => {
+    if (isUnmounted) return
+
+    // Cancel previous stream
+    if (serviceAbortController) {
+      serviceAbortController.abort()
+    }
+    serviceAbortController = new AbortController()
+
     try {
+      console.log('[ServiceRegistry] Starting service stream...')
       const transport = createConnectTransport({
         baseUrl: window.location.origin,
         useBinaryFormat: true
@@ -24,23 +39,60 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
 
       const client = createClient(PlatformRegistration, transport)
 
-      const response = await client.listServices({})
+      for await (const response of client.watchServices({}, {
+        signal: serviceAbortController.signal,
+        timeoutMs: undefined
+      })) {
+        const services = new Set<string>()
+        for (const details of response.services) {
+          if (details.isHealthy) {
+            services.add(details.serviceName)
+          }
+        }
 
-      const services = new Set<string>()
-      for (const details of response.services) {
-        if (details.isHealthy) {
-          services.add(details.serviceName)
+        // Only update and log if services actually changed
+        const current = availableServices.value
+        const hasChanged =
+          services.size !== current.size ||
+          Array.from(services).some(s => !current.has(s))
+
+        if (hasChanged) {
+          availableServices.value = services
+          console.log('[ServiceRegistry] Services updated:', Array.from(services))
         }
       }
-      availableServices.value = services
+
+      console.log('[ServiceRegistry] Service stream ended')
     } catch (error: any) {
-      console.error('[ServiceRegistry] Failed to list services:', error)
+      // Don't log canceled errors (expected during cleanup)
+      if (error instanceof ConnectError && error.code === Code.Canceled) {
+        console.log('[ServiceRegistry] Service stream canceled')
+        return
+      }
+
+      console.error('[ServiceRegistry] Service stream error:', error)
+
+      // Retry with exponential backoff
+      if (!isUnmounted) {
+        const delay = 5000 // 5 seconds
+        console.log(`[ServiceRegistry] Retrying service stream in ${delay}ms...`)
+        setTimeout(() => startServiceStream(), delay)
+      }
     }
   }
 
-  // Fetch modules (polling)
-  const fetchModules = async () => {
+  // Watch modules (streaming)
+  const startModuleStream = async (): Promise<void> => {
+    if (isUnmounted) return
+
+    // Cancel previous stream
+    if (moduleAbortController) {
+      moduleAbortController.abort()
+    }
+    moduleAbortController = new AbortController()
+
     try {
+      console.log('[ServiceRegistry] Starting module stream...')
       const transport = createConnectTransport({
         baseUrl: window.location.origin,
         useBinaryFormat: true
@@ -48,20 +100,49 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
 
       const client = createClient(PlatformRegistration, transport)
 
-      const response = await client.listModules({})
+      console.log('[ServiceRegistry] PlatformRegistration service methods:', Object.keys(PlatformRegistration.methods))
+      console.log('[ServiceRegistry] Client methods:', Object.keys(client))
+      console.log('[ServiceRegistry] Has watchModules?', 'watchModules' in client, typeof client.watchModules)
 
-      console.log('[ServiceRegistry] ListModules response:', response)
-      const modules = new Set<string>()
-      for (const details of response.modules) {
-        console.log('[ServiceRegistry] Module details:', details, 'isHealthy:', details.isHealthy, 'moduleName:', details.moduleName)
-        if (details.isHealthy) {
-          modules.add(details.moduleName)
+      for await (const response of client.watchModules({}, {
+        signal: moduleAbortController.signal,
+        timeoutMs: undefined
+      })) {
+        const modules = new Set<string>()
+        for (const details of response.modules) {
+          if (details.isHealthy) {
+            modules.add(details.moduleName)
+          }
+        }
+
+        // Only update and log if modules actually changed
+        const current = availableModules.value
+        const hasChanged =
+          modules.size !== current.size ||
+          Array.from(modules).some(m => !current.has(m))
+
+        if (hasChanged) {
+          availableModules.value = modules
+          console.log('[ServiceRegistry] Modules updated:', Array.from(modules))
         }
       }
-      console.log('[ServiceRegistry] Available modules:', Array.from(modules))
-      availableModules.value = modules
+
+      console.log('[ServiceRegistry] Module stream ended')
     } catch (error: any) {
-      console.error('[ServiceRegistry] Failed to list modules:', error)
+      // Don't log canceled errors (expected during cleanup)
+      if (error instanceof ConnectError && error.code === Code.Canceled) {
+        console.log('[ServiceRegistry] Module stream canceled')
+        return
+      }
+
+      console.error('[ServiceRegistry] Module stream error:', error)
+
+      // Retry with exponential backoff
+      if (!isUnmounted) {
+        const delay = 5000 // 5 seconds
+        console.log(`[ServiceRegistry] Retrying module stream in ${delay}ms...`)
+        setTimeout(() => startModuleStream(), delay)
+      }
     }
   }
 
@@ -72,38 +153,33 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
       return // Already initialized
     }
     isInitialized = true
-    console.log('[ServiceRegistry] Initializing polling...')
+    console.log('[ServiceRegistry] Initializing streams...')
 
-    // Initial fetch
-    fetchServices()
-    fetchModules()
-
-    // Poll services every 5 seconds
-    serviceInterval = setInterval(fetchServices, 5000)
-
-    // Poll modules every 10 seconds
-    moduleInterval = setInterval(fetchModules, 10000)
+    // Start both streams (real-time)
+    startServiceStream()
+    startModuleStream()
   }
 
   const cleanup = () => {
-    console.log('[ServiceRegistry] Cleaning up polling')
-    
-    // Clear service interval
-    if (serviceInterval) {
-      clearInterval(serviceInterval)
-      serviceInterval = null
+    console.log('[ServiceRegistry] Cleaning up streams')
+    isUnmounted = true
+
+    // Cancel service stream
+    if (serviceAbortController) {
+      serviceAbortController.abort()
+      serviceAbortController = null
     }
 
-    // Clear module interval
-    if (moduleInterval) {
-      clearInterval(moduleInterval)
-      moduleInterval = null
+    // Cancel module stream
+    if (moduleAbortController) {
+      moduleAbortController.abort()
+      moduleAbortController = null
     }
 
     isInitialized = false
   }
 
-  // Auto-initialize polling when store is first created
+  // Auto-initialize when store is first created
   initializeStreams()
 
   return {
