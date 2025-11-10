@@ -304,7 +304,7 @@ import {
   PipeDocSchema,
   SearchMetadataSchema,
   type PipeDoc
-} from '@io-pipeline/grpc-stubs/core'
+} from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
 
 interface Props {
   document?: PipeDoc | null

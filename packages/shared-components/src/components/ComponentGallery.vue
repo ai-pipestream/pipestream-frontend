@@ -176,8 +176,8 @@
 <script setup lang="ts">
 import { ref, computed, markRaw } from 'vue'
 import { create } from '@bufbuild/protobuf'
-import { PipeDocSchema, SearchMetadataSchema } from '@io-pipeline/grpc-stubs/core'
-import { ApplyMappingResponseSchema } from '@io-pipeline/grpc-stubs/mapping'
+import { PipeDocSchema, SearchMetadataSchema } from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
+import { ApplyMappingResponseSchema } from '@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb'
 
 // Import all components dynamically
 import * as SharedComponents from '../index'

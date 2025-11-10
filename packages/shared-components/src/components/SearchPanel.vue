@@ -55,8 +55,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { createClient } from '@connectrpc/connect'
-import { createBinaryTransport } from '@io-pipeline/grpc-stubs'
-import { PipeDocService } from '@io-pipeline/grpc-stubs/pipedoc'
+import { createConnectTransport } from '@connectrpc/connect-web'
+import { PipeDocService } from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'
 
 interface Props {
   target?: string
@@ -70,7 +70,10 @@ const props = withDefaults(defineProps<Props>(), {
   connectorId: '',
 })
 
-const transport = createBinaryTransport()
+const transport = createConnectTransport({
+  baseUrl: window.location.origin,
+  useBinaryFormat: true
+})
 const repo = createClient(PipeDocService, transport)
 
 const query = ref('')
