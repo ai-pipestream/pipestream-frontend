@@ -9,8 +9,8 @@
 
 import { create } from '@bufbuild/protobuf';
 import { TimestampSchema } from '@bufbuild/protobuf/wkt';
-import { StreamingChunkSchema, BlobMetadataSchema, type StreamingChunk, type BlobMetadata } from '@io-pipeline/grpc-stubs/connector';
-import { BlobSchema, ChecksumType, FileStorageReferenceSchema, type Blob } from '@io-pipeline/grpc-stubs/core';
+import { StreamingChunkSchema, BlobMetadataSchema, type StreamingChunk, type BlobMetadata } from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb';
+import { BlobSchema, ChecksumType, FileStorageReferenceSchema, type Blob } from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb';
 import { createHash } from 'crypto';
 
 // Configuration

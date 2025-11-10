@@ -50,7 +50,7 @@ const testDocument = ref({
 - Other services can import and use these components
 - We're ready to create a shared component library
 
-Once all components are migrated, we can move them to a dedicated @io-pipeline/shared-components package.`,
+Once all components are migrated, we can move them to a dedicated @ai-pipestream/shared-components package.`,
   originalMimeType: 'text/markdown',
   metadata: {
     test: 'shared-import',

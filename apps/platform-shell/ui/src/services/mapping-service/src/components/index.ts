@@ -9,7 +9,7 @@ export {
   PipeDocPreview,
   ComponentGallery,
   componentMetadata 
-} from '@io-pipeline/shared-components'
+} from '@ai-pipestream/shared-components'
 
 // Re-export types that components might need
-export type { PipeDoc } from '@io-pipeline/grpc-stubs/pipedoc'
+export type { PipeDoc } from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'

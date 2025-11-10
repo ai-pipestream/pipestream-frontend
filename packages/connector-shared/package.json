@@ -1,5 +1,5 @@
 {
-  "name": "@io-pipeline/connector-shared",
+  "name": "@ai-pipestream/connector-shared",
   "version": "1.0.0",
   "description": "Backend utilities for connector functionality including streaming protocols, upload clients, and document processing",
   "type": "module",
@@ -36,13 +36,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "url": "https://github.com/ai-pipestream/platform-frontend.git",
     "directory": "packages/connector-shared"
   },
   "bugs": {
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+    "url": "https://github.com/ai-pipestream/platform-frontend/issues"
   },
-  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries#readme",
+  "homepage": "https://github.com/ai-pipestream/platform-frontend/tree/main/packages/connector-shared#readme",
   "license": "Apache-2.0",
   "author": "Pipeline Team",
   "keywords": [
@@ -53,14 +53,15 @@
     "document-processing"
   ],
   "publishConfig": {
-    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.6.3",
     "@connectrpc/connect": "^2.0.3",
     "@connectrpc/connect-web": "^2.0.3",
     "@connectrpc/connect-node": "^2.1.0",
-    "@io-pipeline/grpc-stubs": "1.0.9",
+    "@ai-pipestream/grpc-stubs": "0.1.2",
     "chalk": "^5.6.2",
     "mime-types": "^3.0.1"
   },

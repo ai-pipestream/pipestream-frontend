@@ -1,5 +1,4 @@
 import { createClient } from '@connectrpc/connect'
-import { createBinaryTransport } from '@io-pipeline/grpc-stubs'
 import { create } from '@bufbuild/protobuf'
 import {
   AccountService,
@@ -11,7 +10,7 @@ import {
   ListAccountsRequestSchema,
   ListAccountsResponseSchema,
   UpdateAccountRequestSchema
-} from '@io-pipeline/grpc-stubs/account'
+} from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb'
 
 // Type imports for TypeScript type checking only
 import type { 
@@ -23,11 +22,11 @@ import type {
   ListAccountsRequest,
   ListAccountsResponse,
   UpdateAccountRequest
-} from '@io-pipeline/grpc-stubs/account'
+} from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb'
 
 // Create transport to connect through web-proxy using binary format
 // The web-proxy will route to account-manager based on the service definitions
-const transport = createBinaryTransport()
+const transport = createConnectTransport()
 
 // Create service client
 export const accountClient = createClient(AccountService, transport)

@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { SearchPanel } from '@io-pipeline/shared-components'
+import { SearchPanel } from '@ai-pipestream/shared-components'
 const tab = ref('search')
 </script>
 

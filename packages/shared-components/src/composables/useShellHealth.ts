@@ -1,9 +1,9 @@
 import { ref, shallowRef, onUnmounted, readonly } from 'vue'
 import { createClient, ConnectError, Code } from '@connectrpc/connect'
-import { createBinaryTransport } from '@io-pipeline/grpc-stubs'
+import { createConnectTransport } from '@connectrpc/connect-web'
 import { create } from '@bufbuild/protobuf'
-import { ShellService, type ServiceHealthUpdate, ServiceHealthUpdateSchema } from '@io-pipeline/grpc-stubs/shell'
-import { HealthCheckResponse_ServingStatus as ServingStatus } from '@io-pipeline/grpc-stubs/health'
+import { ShellService, type ServiceHealthUpdate, ServiceHealthUpdateSchema } from '@ai-pipestream/grpc-stubs/dist/frontend/shell_service_pb'
+import { HealthCheckResponse_ServingStatus as ServingStatus } from '@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb'
 
 interface HealthSnapshot {
   services: Array<{
@@ -26,7 +26,10 @@ export function useShellHealth() {
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
   let isUnmounted = false
 
-  const transport = createBinaryTransport()
+  const transport = createConnectTransport({
+    baseUrl: window.location.origin,
+    useBinaryFormat: true
+  })
   const client = createClient(ShellService, transport)
 
   const fetchFallbackSnapshot = async (): Promise<void> => {

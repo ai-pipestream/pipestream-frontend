@@ -1,5 +1,5 @@
 {
-  "name": "@io-pipeline/platform-frontend",
+  "name": "@ai-pipestream/platform-frontend",
   "version": "1.0.0",
   "private": true,
   "description": "Frontend monorepo for IO Pipeline platform applications",
@@ -9,7 +9,7 @@
     "test": "pnpm -r test",
     "clean": "pnpm -r clean && rm -rf node_modules"
   },
-  "keywords": ["monorepo", "frontend", "io-pipeline"],
+  "keywords": ["monorepo", "frontend", "ai-pipestream"],
   "author": "IO Pipeline",
   "license": "MIT",
   "engines": {

@@ -91,10 +91,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { createClient } from '@connectrpc/connect'
-import { createBinaryTransport } from '@io-pipeline/grpc-stubs'
-import { PipeDocService } from '@io-pipeline/grpc-stubs/pipedoc'
-import { MappingService } from '@io-pipeline/grpc-stubs/mapping'
-import type { PipeDoc } from '@io-pipeline/grpc-stubs/core'
+import { createConnectTransport } from '@connectrpc/connect-web'
+import { PipeDocService } from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'
+import { MappingService } from '@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb'
+import type { PipeDoc } from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
 import PipeDocPreview from './PipeDocPreview.vue'
 import ResponseViewer from './ResponseViewer.vue'
 import PipeDocEditorCard from './PipeDocEditorCard.vue'
@@ -127,7 +127,10 @@ const emit = defineEmits<{
   (e: 'add-data'): void
 }>()
 
-const transport = createBinaryTransport()
+const transport = createConnectTransport({
+  baseUrl: window.location.origin,
+  useBinaryFormat: true
+})
 const repo = createClient(PipeDocService, transport)
 const mapper = createClient(MappingService, transport)
 

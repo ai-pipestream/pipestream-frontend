@@ -28,8 +28,8 @@ export default defineConfig({
         '@bufbuild/protobuf',
         '@connectrpc/connect',
         '@connectrpc/connect-web',
-        '@io-pipeline/grpc-stubs',
-        /^@io-pipeline\/grpc-stubs\//,
+        '@ai-pipestream/grpc-stubs',
+        /^@ai-pipestream\/grpc-stubs\//,
         /^vuetify/,
         /^@mdi/
       ],
@@ -48,8 +48,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@io-pipeline/grpc-stubs': 'https://git.rokkon.com/api/packages/io-pipeline/npm/@io-pipeline/grpc-stubs'
+      '@': resolve(__dirname, 'src')
     }
   }
 })

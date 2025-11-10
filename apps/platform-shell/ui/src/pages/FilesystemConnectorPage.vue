@@ -197,7 +197,7 @@ import {
   createProgressHandler,
   type UploadResult,
   type UploadStats
-} from '@io-pipeline/connector-shared/browser';
+} from '@ai-pipestream/connector-shared/browser';
 
 const selectedFile = ref<File | null>(null);
 const filePath = ref('');

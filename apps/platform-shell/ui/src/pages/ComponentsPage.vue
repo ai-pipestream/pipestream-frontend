@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ComponentGallery } from '@io-pipeline/shared-components'
+import { ComponentGallery } from '@ai-pipestream/shared-components'
 </script>
 
 <style scoped>

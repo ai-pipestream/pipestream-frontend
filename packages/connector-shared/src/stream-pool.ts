@@ -9,7 +9,7 @@ import {
   type DocumentIntakeRequest,
   type DocumentIntakeResponse,
   type SessionStart,
-} from '@io-pipeline/grpc-stubs/connector';
+} from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb';
 import chalk from 'chalk';
 import { EventEmitter } from 'events';
 

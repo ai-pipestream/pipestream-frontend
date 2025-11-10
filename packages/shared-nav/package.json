@@ -1,5 +1,5 @@
 {
-  "name": "@io-pipeline/shared-nav",
+  "name": "@ai-pipestream/shared-nav",
   "version": "1.0.0",
   "description": "Navigation shell components (AppShell, Drawer, AppBar) for Pipeline platform frontends",
   "type": "module",
@@ -26,13 +26,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "url": "https://github.com/ai-pipestream/platform-frontend.git",
     "directory": "packages/shared-nav"
   },
   "bugs": {
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+    "url": "https://github.com/ai-pipestream/platform-frontend/issues"
   },
-  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries/tree/main/packages/shared-nav#readme",
+  "homepage": "https://github.com/ai-pipestream/platform-frontend/tree/main/packages/shared-nav#readme",
   "license": "Apache-2.0",
   "author": "Pipeline Team",
   "keywords": [
@@ -44,10 +44,11 @@
     "ui-components"
   ],
   "publishConfig": {
-    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "dependencies": {
-    "@io-pipeline/grpc-stubs": "1.0.9",
+    "@ai-pipestream/grpc-stubs": "0.1.2",
     "vue": "^3.5.18"
   },
   "peerDependencies": {

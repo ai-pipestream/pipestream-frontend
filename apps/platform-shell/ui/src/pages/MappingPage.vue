@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { MappingWorkbench } from '@io-pipeline/shared-components'
+import { MappingWorkbench } from '@ai-pipestream/shared-components'
 </script>
 
 <style scoped>

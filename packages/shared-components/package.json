@@ -1,5 +1,5 @@
 {
-  "name": "@io-pipeline/shared-components",
+  "name": "@ai-pipestream/shared-components",
   "version": "1.0.7",
   "description": "Vue 3 + Vuetify 3 UI components library including ComponentGallery for Pipeline platform frontends",
   "type": "module",
@@ -27,13 +27,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "url": "https://github.com/ai-pipestream/platform-frontend.git",
     "directory": "packages/shared-components"
   },
   "bugs": {
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+    "url": "https://github.com/ai-pipestream/platform-frontend/issues"
   },
-  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries/tree/main/packages/shared-components#readme",
+  "homepage": "https://github.com/ai-pipestream/platform-frontend/tree/main/packages/shared-components#readme",
   "license": "Apache-2.0",
   "author": "Pipeline Team",
   "keywords": [
@@ -45,13 +45,14 @@
     "component-gallery"
   ],
   "publishConfig": {
-    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "dependencies": {
     "@bufbuild/protobuf": "latest",
     "@connectrpc/connect": "^2.1.0",
     "@connectrpc/connect-web": "^2.1.0",
-    "@io-pipeline/grpc-stubs": "1.0.9",
+    "@ai-pipestream/grpc-stubs": "0.1.2",
     "@jsonforms/core": "^3.7.0-alpha.2",
     "@jsonforms/vue": "^3.7.0-alpha.2",
     "@jsonforms/vue-vuetify": "^3.7.0-alpha.2",

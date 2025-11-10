@@ -5,12 +5,11 @@
  */
 
 import { createClient } from '@connectrpc/connect'
-import { createBinaryTransport } from '@io-pipeline/grpc-stubs'
-import { PlatformRegistration } from '@io-pipeline/grpc-stubs/registration'
-import type { ServiceDetails, ServiceListResponse } from '@io-pipeline/grpc-stubs/registration'
+import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+import type { ServiceDetails, ServiceListResponse } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
 
 // Create the transport - uses same origin to reach /connect/* through Traefik
-export const transport = createBinaryTransport()
+export const transport = createConnectTransport()
 
 // Create the client
 export const registrationClient = createClient(PlatformRegistration, transport)

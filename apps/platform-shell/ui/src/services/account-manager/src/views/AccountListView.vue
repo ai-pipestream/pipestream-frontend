@@ -159,7 +159,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAccount, inactivateAccount as inactivateAccountService, reactivateAccount as reactivateAccountService, listAccounts as listAccountsService } from '../services/accountClient'
-import type { Account } from '@io-pipeline/grpc-stubs/account'
+import type { Account } from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb'
 
 const router = useRouter()
 

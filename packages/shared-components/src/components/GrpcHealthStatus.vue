@@ -43,8 +43,8 @@
 <script setup lang="ts">
 import { ref, onUnmounted, watch, computed, shallowRef } from 'vue';
 import { createClient, ConnectError, Code } from '@connectrpc/connect';
-import { Health, HealthCheckResponse_ServingStatus as ServingStatus, type HealthCheckResponse } from '@io-pipeline/grpc-stubs/health';
-import { createBinaryTransport } from '@io-pipeline/grpc-stubs';
+import { Health, HealthCheckResponse_ServingStatus as ServingStatus, type HealthCheckResponse } from '@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb';
+import { createConnectTransport } from '@connectrpc/connect-web';
 
 //##############################################################################
 // 1. PROPS AND TYPES
@@ -79,11 +79,15 @@ const props = withDefaults(defineProps<GrpcHealthStatusProps>(), {
 // Create a dynamic transport that reacts to the `target` prop
 const transport = computed(() => {
   // Always use the default proxy URL, just add headers if target is specified
-  const options = props.target 
+  const options = props.target
     ? { headers: { 'x-target-backend': props.target } }
     : {};
-  
-  return createBinaryTransport(`http://${window.location.hostname}:38106`, options);
+
+  return createConnectTransport({
+    baseUrl: `http://${window.location.hostname}:38106`,
+    useBinaryFormat: true,
+    ...options
+  });
 });
 
 // Create a dynamic client that reacts to the transport

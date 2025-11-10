@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { ServiceRegistration, GrpcHealthStatus } from '@io-pipeline/shared-components'
+import { ServiceRegistration, GrpcHealthStatus } from '@ai-pipestream/shared-components'
 
 // Registered services
 const registeredServices = ref<any[]>([])

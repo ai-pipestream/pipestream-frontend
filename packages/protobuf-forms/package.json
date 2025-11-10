@@ -1,5 +1,5 @@
 {
-  "name": "@io-pipeline/protobuf-forms",
+  "name": "@ai-pipestream/protobuf-forms",
   "version": "1.0.0",
   "description": "Type-safe form generation from Protocol Buffer messages using JSONForms",
   "main": "dist/index.js",
@@ -32,13 +32,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries.git",
+    "url": "https://github.com/ai-pipestream/platform-frontend.git",
     "directory": "packages/protobuf-forms"
   },
   "bugs": {
-    "url": "https://git.rokkon.com/io-pipeline/node-libraries/issues"
+    "url": "https://github.com/ai-pipestream/platform-frontend/issues"
   },
-  "homepage": "https://git.rokkon.com/io-pipeline/node-libraries/tree/main/packages/protobuf-forms#readme",
+  "homepage": "https://github.com/ai-pipestream/platform-frontend/tree/main/packages/protobuf-forms#readme",
   "license": "Apache-2.0",
   "author": "Pipeline Team",
   "keywords": [
@@ -50,7 +50,8 @@
     "pipeline"
   ],
   "publishConfig": {
-    "registry": "https://git.rokkon.com/api/packages/io-pipeline/npm"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.7.0"

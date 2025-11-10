@@ -388,10 +388,10 @@ import { create } from '@bufbuild/protobuf'
 // TimestampSchema not needed; use plain object for MessageInit<Timestamp>
 // These will be uncommented when backend is ready
 // import { createClient } from '@connectrpc/connect'
-// import { ServiceRegistration, createGrpcWebTransport } from '@io-pipeline/grpc-stubs/registration'
+// import { ServiceRegistration, createGrpcWebTransport } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
 import {
   ServiceRegistrationRequestSchema
-} from '@io-pipeline/grpc-stubs/registration'
+} from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
 
 interface Props {
   endpoint?: string

@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ModuleConfigPanel } from '@io-pipeline/shared-components'
+import { ModuleConfigPanel } from '@ai-pipestream/shared-components'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 </script>

@@ -13,8 +13,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { NavShell } from '@io-pipeline/shared-nav';
-import type { NavItem } from '@io-pipeline/shared-nav';
+import { NavShell } from '@ai-pipestream/shared-nav';
+import type { NavItem } from '@ai-pipestream/shared-nav';
 import { useServiceRegistryStore } from './stores/serviceRegistry';
 import SystemError from './components/SystemError.vue';
 

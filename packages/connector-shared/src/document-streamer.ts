@@ -9,8 +9,8 @@
 
 import { create } from '@bufbuild/protobuf';
 import { TimestampSchema } from '@bufbuild/protobuf/wkt';
-import { DocumentIntakeRequestSchema, DocumentDataSchema, type DocumentIntakeRequest } from '@io-pipeline/grpc-stubs/connector';
-import { ChecksumType } from '@io-pipeline/grpc-stubs/core';
+import { DocumentIntakeRequestSchema, DocumentDataSchema, type DocumentIntakeRequest } from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb';
+import { ChecksumType } from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb';
 import { createReadStream, ReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import { basename, relative } from 'path';

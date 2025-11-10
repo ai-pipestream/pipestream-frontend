@@ -1,15 +1,15 @@
 import { ConnectRouter, Code, ConnectError } from "@connectrpc/connect";
 import { createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { PipeStepProcessor } from "@io-pipeline/grpc-stubs/module";
-import { MappingService } from "@io-pipeline/grpc-stubs/mapping";
-import { PlatformRegistration } from "@io-pipeline/grpc-stubs/registration";
-import { Health } from "@io-pipeline/grpc-stubs/health";
-import { ShellService } from "@io-pipeline/grpc-stubs/shell";
-import { NodeUploadService } from "@io-pipeline/grpc-stubs/upload";
-import { PipeDocService } from "@io-pipeline/grpc-stubs/pipedoc";
-import { AccountService } from "@io-pipeline/grpc-stubs/account";
-import { ConnectorAdminService } from "@io-pipeline/grpc-stubs/connector";
+import { PipeStepProcessor } from "@ai-pipestream/grpc-stubs/dist/module/module_service_pb";
+import { MappingService } from "@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb";
+import { PlatformRegistration } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
+import { Health } from "@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb";
+import { ShellService } from "@ai-pipestream/grpc-stubs/dist/frontend/shell_service_pb";
+import { NodeUploadService } from "@ai-pipestream/grpc-stubs/dist/repository/filesystem/upload/upload_service_pb";
+import { PipeDocService } from "@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb";
+import { AccountService } from "@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb";
+import { ConnectorAdminService } from "@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb";
 import { createDynamicTransport, resolveService } from "../lib/serviceResolver.js";
 
 // Get platform-registration-service URL from environment or use default

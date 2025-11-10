@@ -148,7 +148,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import type { NavItem } from '@io-pipeline/shared-nav'
+import type { NavItem } from '@ai-pipestream/shared-nav'
 import { getInfraUrl } from '../config/infrastructure'
 
 interface LinkItem {

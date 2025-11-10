@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['@io-pipeline/grpc-stubs'],
+    exclude: ['@ai-pipestream/grpc-stubs'],
     esbuildOptions: {
       target: 'es2020',
     },
