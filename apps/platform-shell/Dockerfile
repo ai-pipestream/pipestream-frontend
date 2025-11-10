@@ -35,17 +35,8 @@ COPY apps/platform-shell/src ./apps/platform-shell/src
 COPY apps/platform-shell/ui ./apps/platform-shell/ui
 COPY apps/platform-shell/tsconfig.json ./apps/platform-shell/
 
-# Build all packages (UI depends on shared-components and shared-nav)
-RUN pnpm --filter @ai-pipestream/connector-shared build
-RUN pnpm --filter @ai-pipestream/protobuf-forms build
-RUN pnpm --filter @ai-pipestream/shared-components build
-RUN pnpm --filter @ai-pipestream/shared-nav build
-
-# Build platform-shell backend (TypeScript → JavaScript in dist/)
-RUN cd apps/platform-shell && pnpm run build
-
-# Build platform-shell frontend UI (Vite → static assets)
-RUN cd apps/platform-shell/ui && pnpm run build
+# Build all packages and apps recursively (handles dependency order automatically)
+RUN pnpm -r build
 
 # Stage 2: Production runtime (minimal image)
 FROM node:22-alpine AS runtime
