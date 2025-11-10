@@ -1,6 +1,6 @@
 # Platform Frontend
 
-[![Build Status](https://github.com/io-pipeline/platform-frontend/workflows/Build%20and%20Publish%20Platform%20Frontend/badge.svg)](https://github.com/io-pipeline/platform-frontend/actions)
+[![Build Status](https://github.com/ai-pipestream/platform-frontend/workflows/Build%20and%20Publish%20Platform%20Frontend/badge.svg)](https://github.com/ai-pipestream/platform-frontend/actions)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Frontend monorepo for the IO Pipeline platform, containing the unified Platform Shell application and reusable UI component libraries.
@@ -31,16 +31,16 @@ platform-frontend/
 
 ## Packages
 
-This monorepo contains the following packages under the `@io-pipeline` scope:
+This monorepo contains the following packages under the `@ai-pipestream` scope:
 
 | Package | Version | Description | Registry |
 |---------|---------|-------------|----------|
-| @io-pipeline/shared-components | 1.0.7 | Vue 3 + Vuetify 3 UI components with ComponentGallery | Private |
-| @io-pipeline/shared-nav | 1.0.0 | Navigation shell (AppShell, Drawer, AppBar) | Private |
-| @io-pipeline/connector-shared | 1.0.0 | Backend utilities for connectors and streaming | Private |
-| @io-pipeline/protobuf-forms | 1.0.0 | Type-safe form generation from protobuf messages | Private |
+| @ai-pipestream/shared-components | 1.0.7 | Vue 3 + Vuetify 3 UI components with ComponentGallery | Public |
+| @ai-pipestream/shared-nav | 1.0.0 | Navigation shell (AppShell, Drawer, AppBar) | Public |
+| @ai-pipestream/connector-shared | 1.0.0 | Backend utilities for connectors and streaming | Public |
+| @ai-pipestream/protobuf-forms | 1.0.0 | Type-safe form generation from protobuf messages | Public |
 
-**Note**: Packages are published to a private npm registry. The monorepo depends on [@io-pipeline/grpc-stubs](https://www.npmjs.com/package/@io-pipeline/grpc-stubs) which is published to public npm.
+**Note**: All packages are published to the public npm registry at npmjs.org, including [@ai-pipestream/grpc-stubs](https://www.npmjs.com/package/@ai-pipestream/grpc-stubs).
 
 ## Prerequisites
 
@@ -106,10 +106,10 @@ Access at: http://localhost:38106
 
 ### Pre-built Images
 
-Images are automatically published to Gitea Container Registry on every push to `main`:
+Images are automatically published to GitHub Container Registry on every push to `main`:
 
 ```bash
-docker pull git.rokkon.com/io-pipeline/platform-shell:latest
+docker pull ghcr.io/ai-pipestream/platform-shell:latest
 ```
 
 ## Development Scripts
@@ -166,21 +166,18 @@ The platform gracefully handles service unavailability:
 pnpm -r build
 
 # Build specific package
-pnpm --filter @io-pipeline/shared-components build
+pnpm --filter @ai-pipestream/shared-components build
 
 # Watch mode for development
-pnpm --filter @io-pipeline/shared-components dev
+pnpm --filter @ai-pipestream/shared-components dev
 ```
 
 ### Publishing
 
-Packages are published to the private Gitea npm registry. Ensure you have authentication configured in `.npmrc`:
+Packages are published to the public npm registry at npmjs.org:
 
 ```bash
-# Configure authentication (one-time setup)
-echo "//git.rokkon.com/api/packages/io-pipeline/npm/:_authToken=YOUR_TOKEN" >> ~/.npmrc
-
-# Publish a package
+# Publish a package (requires npm authentication)
 cd packages/shared-components
 pnpm publish
 ```
@@ -252,8 +249,8 @@ Reusable UI components including:
 - Layout components: Cards, dialogs, etc.
 
 ```typescript
-import { ComponentGallery } from '@io-pipeline/shared-components';
-import '@io-pipeline/shared-components/dist/style.css';
+import { ComponentGallery } from '@ai-pipestream/shared-components';
+import '@ai-pipestream/shared-components/dist/style.css';
 ```
 
 #### shared-nav
@@ -264,7 +261,7 @@ Navigation shell components:
 - Drawer: Side navigation drawer
 
 ```typescript
-import { NavShell } from '@io-pipeline/shared-nav';
+import { NavShell } from '@ai-pipestream/shared-nav';
 ```
 
 #### connector-shared
@@ -275,7 +272,7 @@ Backend utilities for connector functionality:
 - Document processing utilities
 
 ```typescript
-import { createUploadClient } from '@io-pipeline/connector-shared';
+import { createUploadClient } from '@ai-pipestream/connector-shared';
 ```
 
 #### protobuf-forms
@@ -283,7 +280,7 @@ import { createUploadClient } from '@io-pipeline/connector-shared';
 Type-safe form generation from Protocol Buffer messages:
 
 ```typescript
-import { createFormSchema } from '@io-pipeline/protobuf-forms';
+import { createFormSchema } from '@ai-pipestream/protobuf-forms';
 import { MyMessage } from './generated/my_pb';
 
 const schema = createFormSchema(MyMessage);
@@ -379,15 +376,14 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Links
 
-- **GitHub Repository**: https://github.com/io-pipeline/platform-frontend
-- **Gitea Repository**: https://git.rokkon.com/io-pipeline/platform-frontend
-- **Issue Tracker**: https://github.com/io-pipeline/platform-frontend/issues
+- **GitHub Repository**: https://github.com/ai-pipestream/platform-frontend
+- **Issue Tracker**: https://github.com/ai-pipestream/platform-frontend/issues
 - **Documentation**: [Platform Shell README](apps/platform-shell/README.md)
-- **Public Dependency**: [@io-pipeline/grpc-stubs on npm](https://www.npmjs.com/package/@io-pipeline/grpc-stubs)
+- **Public Dependency**: [@ai-pipestream/grpc-stubs on npm](https://www.npmjs.com/package/@ai-pipestream/grpc-stubs)
 
 ## Support
 
 For questions or issues:
-1. Check existing [GitHub Issues](https://github.com/io-pipeline/platform-frontend/issues)
+1. Check existing [GitHub Issues](https://github.com/ai-pipestream/platform-frontend/issues)
 2. Create a new issue with details about your environment and problem
 3. Tag issues appropriately (bug, enhancement, question, etc.)

@@ -31,12 +31,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://git.rokkon.com/ai-pipestream/platform-shell.git"
+    "url": "https://github.com/ai-pipestream/platform-frontend.git"
   },
   "bugs": {
-    "url": "https://git.rokkon.com/ai-pipestream/platform-shell/issues"
+    "url": "https://github.com/ai-pipestream/platform-frontend/issues"
   },
-  "homepage": "https://git.rokkon.com/ai-pipestream/platform-shell#readme",
+  "homepage": "https://github.com/ai-pipestream/platform-frontend#readme",
   "dependencies": {
     "@bufbuild/protobuf": "latest",
     "@connectrpc/connect": "latest",

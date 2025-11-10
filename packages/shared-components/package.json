@@ -27,13 +27,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.rokkon.com/ai-pipestream/node-libraries.git",
+    "url": "https://github.com/ai-pipestream/platform-frontend.git",
     "directory": "packages/shared-components"
   },
   "bugs": {
-    "url": "https://git.rokkon.com/ai-pipestream/node-libraries/issues"
+    "url": "https://github.com/ai-pipestream/platform-frontend/issues"
   },
-  "homepage": "https://git.rokkon.com/ai-pipestream/node-libraries/tree/main/packages/shared-components#readme",
+  "homepage": "https://github.com/ai-pipestream/platform-frontend/tree/main/packages/shared-components#readme",
   "license": "Apache-2.0",
   "author": "Pipeline Team",
   "keywords": [
@@ -45,7 +45,8 @@
     "component-gallery"
   ],
   "publishConfig": {
-    "registry": "https://git.rokkon.com/api/packages/ai-pipestream/npm"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "dependencies": {
     "@bufbuild/protobuf": "latest",

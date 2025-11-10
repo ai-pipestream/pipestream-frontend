@@ -48,8 +48,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@ai-pipestream/grpc-stubs': 'https://git.rokkon.com/api/packages/ai-pipestream/npm/@ai-pipestream/grpc-stubs'
+      '@': resolve(__dirname, 'src')
     }
   }
 })
