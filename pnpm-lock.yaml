@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@ai-pipestream/grpc-stubs':
-      specifier: 0.1.6-alpha.20251110163341
-      version: 0.1.6-alpha.20251110163341
+      specifier: 0.1.6-alpha.20251110170250
+      version: 0.1.6-alpha.20251110170250
     '@bufbuild/protobuf':
       specifier: ^2.10.0
       version: 2.10.0
@@ -43,7 +43,7 @@ importers:
     dependencies:
       '@ai-pipestream/grpc-stubs':
         specifier: 'catalog:'
-        version: 0.1.6-alpha.20251110163341
+        version: 0.1.6-alpha.20251110170250
       '@bufbuild/protobuf':
         specifier: ^2.10.0
         version: 2.10.0
@@ -85,7 +85,7 @@ importers:
         version: link:../../packages/connector-shared
       '@ai-pipestream/grpc-stubs':
         specifier: 'catalog:'
-        version: 0.1.6-alpha.20251110163341
+        version: 0.1.6-alpha.20251110170250
       '@ai-pipestream/protobuf-forms':
         specifier: workspace:*
         version: link:../../packages/protobuf-forms
@@ -140,7 +140,7 @@ importers:
         version: link:../../../packages/connector-shared
       '@ai-pipestream/grpc-stubs':
         specifier: 'catalog:'
-        version: 0.1.6-alpha.20251110163341
+        version: 0.1.6-alpha.20251110170250
       '@ai-pipestream/protobuf-forms':
         specifier: workspace:*
         version: link:../../../packages/protobuf-forms
@@ -225,7 +225,7 @@ importers:
     dependencies:
       '@ai-pipestream/grpc-stubs':
         specifier: 'catalog:'
-        version: 0.1.6-alpha.20251110163341
+        version: 0.1.6-alpha.20251110170250
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.10.0
@@ -296,7 +296,7 @@ importers:
     dependencies:
       '@ai-pipestream/grpc-stubs':
         specifier: 'catalog:'
-        version: 0.1.6-alpha.20251110163341
+        version: 0.1.6-alpha.20251110170250
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.10.0
@@ -345,7 +345,7 @@ importers:
     dependencies:
       '@ai-pipestream/grpc-stubs':
         specifier: 'catalog:'
-        version: 0.1.6-alpha.20251110163341
+        version: 0.1.6-alpha.20251110170250
       vue:
         specifier: 'catalog:'
         version: 3.5.24(typescript@5.9.3)
@@ -374,8 +374,8 @@ importers:
 
 packages:
 
-  '@ai-pipestream/grpc-stubs@0.1.6-alpha.20251110163341':
-    resolution: {integrity: sha512-pxdQZZ2QMS5suZ5xzfF8VsBvlN9mcQnJRrVeAXpyQKFbsOU0SvpGbHL+hg48CIPUkw/MEJU2QYBW47AXziHyGg==}
+  '@ai-pipestream/grpc-stubs@0.1.6-alpha.20251110170250':
+    resolution: {integrity: sha512-UN9YxWwKpWj4ECrZSfHK8+ezixuqbM2sD/SleXXzeDbsIZ1XOB4HpB4wCEMB+2AYCTfAFcvqfsGiIOLzHa5AzA==}
     engines: {node: '>=22.0.0 <23', pnpm: '>=10 <11'}
 
   '@babel/helper-string-parser@7.27.1':
@@ -2693,7 +2693,7 @@ packages:
 
 snapshots:
 
-  '@ai-pipestream/grpc-stubs@0.1.6-alpha.20251110163341':
+  '@ai-pipestream/grpc-stubs@0.1.6-alpha.20251110170250':
     dependencies:
       '@bufbuild/protobuf': 2.10.0
       '@connectrpc/connect': 2.1.0(@bufbuild/protobuf@2.10.0)
