@@ -63,7 +63,7 @@ export function useShellHealth() {
           target: service.target,
           status,
           observedAt: snapshot.checkedAt
-        }))
+        }) as ServiceHealthUpdate)
       }
       
       updates.value = fallbackUpdates
@@ -114,11 +114,12 @@ export function useShellHealth() {
       isConnected.value = true
       isUsingFallback.value = false
       
-      for await (const update of client.watchHealth({}, { 
-        signal: abortController.signal, 
-        timeoutMs: undefined 
+      for await (const update of client.watchHealth({}, {
+        signal: abortController.signal,
+        timeoutMs: undefined
       })) {
-        updates.value = new Map(updates.value).set(update.serviceName, update)
+        const typedUpdate = update as ServiceHealthUpdate;
+        updates.value = new Map(updates.value).set(typedUpdate.serviceName, typedUpdate)
         reconnectAttempts.value = 0 // Reset on successful data
         error.value = null
       }
