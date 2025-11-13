@@ -1,6 +1,6 @@
 import { createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { PlatformRegistration, ServiceDetails } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
+import { PlatformRegistration, ServiceDetails, type ServiceListResponse } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
 import { create } from "@bufbuild/protobuf";
 import { EmptySchema } from "@bufbuild/protobuf/wkt";
 
@@ -32,8 +32,9 @@ async function watchAndCacheServices() {
   try {
     const stream = registrationClient.watchServices(create(EmptySchema, {}));
     for await (const response of stream) {
+      const typedResponse = response as ServiceListResponse;
       const newRegistry = new Map<string, ServiceDetails>();
-      for (const service of response.services) {
+      for (const service of typedResponse.services) {
         newRegistry.set(service.serviceName, service);
       }
       // Atomically update the registry
