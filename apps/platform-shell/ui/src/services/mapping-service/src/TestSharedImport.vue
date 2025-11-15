@@ -6,7 +6,7 @@
         Shared Component Import Test
       </v-card-title>
       <v-card-subtitle>
-        Testing import from @io-pipeline/mapping-service-ui exports
+        Testing import from @ai-pipestream/mapping-service-ui exports
       </v-card-subtitle>
       <v-card-text>
         <v-alert type="success" variant="tonal" class="mb-4">

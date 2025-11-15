@@ -1,6 +1,6 @@
 /**
- * @io-pipeline/connector-service-ui
- * 
+ * @ai-pipestream/connector-service-ui
+ *
  * Vue.js frontend for the Connector Service
  */
 

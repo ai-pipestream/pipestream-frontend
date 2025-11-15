@@ -4,7 +4,7 @@ import { ProtobufToJsonSchemaConverter, JsonSchema, ConversionOptions } from './
 
 // NOTE: Example imports removed - users should import and register their own message types
 // Example usage:
-// import { MyMessageSchema } from '@io-pipeline/grpc-stubs/my-service'
+// import { MyMessageSchema } from '@ai-pipestream/grpc-stubs/my-service'
 // loader.registerMessage('MyMessage', MyMessageSchema)
 
 export interface LoaderOptions extends ConversionOptions {
@@ -30,7 +30,7 @@ export class ProtobufSchemaLoader {
     // Registry starts empty - users register their own message types
     // Example:
     //   loader.registerMessage('MyMessage', MyMessageSchema)
-    //   loader.registerMessage('io.pipeline.my.MyMessage', MyMessageSchema)
+    //   loader.registerMessage('ai.pipestream.my.MyMessage', MyMessageSchema)
   }
   
   /**

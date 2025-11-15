@@ -321,11 +321,11 @@ See `apps/platform-shell/ui/.env.example` for a complete example with all availa
 All backend services are proxied through Connect-ES:
 
 ```
-POST /io.pipeline.platform.registration.PlatformRegistration/ListServices
-POST /io.pipeline.repository.account.AccountService/ListAccounts
-POST /io.pipeline.connector.ConnectorService/ListConnectors
-POST /io.pipeline.mapping.MappingService/GetMapping
-# etc - follows /io.pipeline.{package}.{Service}/{Method} pattern
+POST /ai.pipestream.platform.registration.PlatformRegistration/ListServices
+POST /ai.pipestream.repository.account.AccountService/ListAccounts
+POST /ai.pipestream.connector.ConnectorService/ListConnectors
+POST /ai.pipestream.mapping.MappingService/GetMapping
+# etc - follows /ai.pipestream.{package}.{Service}/{Method} pattern
 ```
 
 ### System Status

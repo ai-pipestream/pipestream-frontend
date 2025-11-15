@@ -458,7 +458,7 @@ app.get('/health', (req, res) => {
 // Serve static files from public directory (built Vue UI)
 app.use(express.static('public'));
 
-// Mount Connect routes (no prefix - services use their natural paths like /io.pipeline.*)
+// Mount Connect routes (no prefix - services use their natural paths like /ai.pipestream.*)
 app.use(
     expressConnectMiddleware({
         routes: connectRoutes,
@@ -470,7 +470,7 @@ async function startServer() {
     try {
         app.listen(PORT, () => {
             console.log(`Web proxy backend listening at http://localhost:${PORT}`);
-            console.log(`Connect RPC services: http://localhost:${PORT}/io.pipeline.*`);
+            console.log(`Connect RPC services: http://localhost:${PORT}/ai.pipestream.*`);
             console.log(`REST API: http://localhost:${PORT}/connect/*`);
             console.log(`Health check: http://localhost:${PORT}/proxy/health`);
         });

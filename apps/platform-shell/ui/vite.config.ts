@@ -43,12 +43,8 @@ export default defineConfig(({ mode }) => {
         clientFiles: ['./src/main.ts'],
       },
       proxy: {
-        // Proxy Connect protocol service requests (ai.pipestream.* and io.pipeline.*)
+        // Proxy Connect protocol service requests (ai.pipestream.*)
         '^/ai\\.pipestream\\.': {
-          target: backendUrl,
-          changeOrigin: true,
-        },
-        '^/io\\.pipeline\\.': {
           target: backendUrl,
           changeOrigin: true,
         },

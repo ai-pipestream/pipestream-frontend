@@ -74,7 +74,7 @@ NODE_ENV=production pnpm start
 
 ```bash
 # Build image
-docker build -t io-pipeline/platform-shell:latest .
+docker build -t ai-pipestream/platform-shell:latest .
 
 # Run
 docker run -d \
@@ -82,17 +82,17 @@ docker run -d \
   -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=platform-registration-service \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  io-pipeline/platform-shell:latest
+  ai-pipestream/platform-shell:latest
 ```
 
 ## Dependencies
 
-Uses published libraries from Gitea registry:
-- `@io-pipeline/grpc-stubs` - Connect-ES service stubs
-- `@io-pipeline/shared-components` - UI components (includes ComponentGallery)
-- `@io-pipeline/shared-nav` - Navigation shell
-- `@io-pipeline/protobuf-forms` - Form generation
-- `@io-pipeline/connector-shared` - Connector utilities
+Uses published libraries from npm registry:
+- `@ai-pipestream/grpc-stubs` - Connect-ES service stubs
+- `@ai-pipestream/shared-components` - UI components (includes ComponentGallery)
+- `@ai-pipestream/shared-nav` - Navigation shell
+- `@ai-pipestream/protobuf-forms` - Form generation
+- `@ai-pipestream/connector-shared` - Connector utilities
 
 ## Environment Variables
 
@@ -105,9 +105,9 @@ Uses published libraries from Gitea registry:
 
 **Connect RPC**:
 ```
-POST /io.pipeline.platform.registration.PlatformRegistration/ListServices
-POST /io.pipeline.repository.account.AccountService/ListAccounts
-# etc - follows /io.pipeline.{package}.{Service}/{Method} pattern
+POST /ai.pipestream.platform.registration.PlatformRegistration/ListServices
+POST /ai.pipestream.repository.account.AccountService/ListAccounts
+# etc - follows /ai.pipestream.{package}.{Service}/{Method} pattern
 ```
 
 **Static Files**:
