@@ -119,3 +119,18 @@ jobs:
         run: |
           docker push ghcr.io/ai-pipestream/platform-shell:${{ steps.version.outputs.tag }}
           docker push ghcr.io/ai-pipestream/platform-shell:latest
+
+      - name: Trigger Docker Hub publish
+        if: success()
+        continue-on-error: true
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: dockerhub-publish
+          client-payload: |
+            {
+              "base_image": "ghcr.io/ai-pipestream/platform-shell",
+              "dockerhub_repo": "pipestreamai/platform-shell",
+              "tags": "${{ steps.version.outputs.tag }} latest"
+            }

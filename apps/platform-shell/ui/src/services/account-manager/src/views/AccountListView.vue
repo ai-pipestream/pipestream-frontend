@@ -30,7 +30,7 @@
             <v-btn
               color="primary"
               prepend-icon="mdi-plus"
-              @click="$router.push('/accounts/create')"
+              @click="$router.push({ name: 'accounts-create' })"
             >
               Create Account
             </v-btn>

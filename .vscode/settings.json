@@ -1,0 +1,108 @@
+{
+  // ============================================
+  // Java - Disabled for this Node.js/pnpm monorepo
+  // ============================================
+  "java.configuration.updateBuildConfiguration": "disabled",
+  "java.compile.nullAnalysis.mode": "off",
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": false,
+  // ============================================
+  // TypeScript Configuration (pnpm monorepo)
+  // ============================================
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  // ============================================
+  // pnpm Workspace Configuration
+  // ============================================
+  "pnpm.enable": true,
+  "pnpm.packageManager": "pnpm",
+  // ============================================
+  // Node.js Configuration
+  // ============================================
+  "node.version": "22",
+  "npm.packageManager": "pnpm",
+  // ============================================
+  // File Associations
+  // ============================================
+  "files.associations": {
+    "*.ts": "typescript",
+    "*.tsx": "typescriptreact",
+    "*.vue": "vue",
+    "*.mjs": "javascript",
+    "*.cjs": "javascript"
+  },
+  // ============================================
+  // File Exclusions
+  // ============================================
+  "files.exclude": {
+    "**/*.class": true,
+    "**/target": true,
+    "**/node_modules": false,
+    "**/dist": false,
+    "**/.pnpm-store": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.pnpm-store/**": true
+  },
+  // ============================================
+  // Search Exclusions
+  // ============================================
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.pnpm-store": true,
+    "**/pnpm-lock.yaml": false
+  },
+  // ============================================
+  // Editor Formatting
+  // ============================================
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit"
+    }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
+  // ============================================
+  // Vue/Volar Configuration
+  // ============================================
+  "volar.autoCompleteRefs": true,
+  "volar.codeLens.pugTools": false,
+  "volar.codeLens.scriptSetupTools": true,
+  // ============================================
+  // Project Structure Recognition
+  // ============================================
+  // Main Node.js projects:
+  // 1. apps/platform-shell (backend Express + frontend Vue)
+  // 2. apps/platform-shell/ui (Vue 3 + Vuetify frontend)
+  // Packages: shared-components, shared-nav, connector-shared, protobuf-forms
+}
