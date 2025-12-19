@@ -2,6 +2,7 @@
   "name": "@ai-pipestream/protobuf-forms",
   "version": "1.0.0",
   "description": "Type-safe form generation from Protocol Buffer messages using JSONForms",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -17,11 +18,9 @@
     },
     "./generated": {
       "import": "./src/generated/index.ts",
-      "types": "./src/generated/index.ts"
-    },
-    "./generated/*": {
-      "import": "./src/generated/*.ts",
-      "types": "./src/generated/*.ts"
+      "require": "./src/generated/index.ts",
+      "types": "./src/generated/index.ts",
+      "default": "./src/generated/index.ts"
     }
   },
   "files": [

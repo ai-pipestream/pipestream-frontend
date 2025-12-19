@@ -4,8 +4,10 @@ import multer from 'multer';
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import { createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { ConnectorIntakeService, Health, PlatformRegistrationService } from "@ai-pipestream/protobuf-forms/generated";
-import { DocumentStreamer } from "@ai-pipestream/connector-shared";
+import { Health, PlatformRegistrationService } from "@ai-pipestream/protobuf-forms/generated";
+// TODO: Re-enable when filesystem connector is rewritten
+// import { ConnectorIntakeService } from "@ai-pipestream/protobuf-forms/generated";
+// import { DocumentStreamer } from "@ai-pipestream/connector-shared";
 import { createDynamicTransport, clearServiceRegistry } from './lib/serviceResolver.js';
 import { createEmptyRegistryGroups, sortEntries, type RegistryEntry } from './models/registry.js';
 import connectRoutes from './routes/connectRoutes.js';
@@ -331,119 +333,19 @@ app.post('/connect/system/invalidate-cache', (req, res) => {
     }
 });
 
-// Upload API endpoints
+// Upload API endpoints - TODO: Re-enable when filesystem connector is rewritten
 app.post('/api/upload/file', async (req, res) => {
-    try {
-        // Handle file upload via FormData or filePath
-        if (req.is('multipart/form-data')) {
-            // Handle FormData file upload
-            const file = req.file;
-            if (!file) {
-                return res.status(400).json({ success: false, error: 'No file provided' });
-            }
-            
-            // Create gRPC client to connector-intake-service
-            const connectorIntakeTransport = createGrpcTransport({
-                baseUrl: 'http://localhost:38108',
-            });
-            const connectorIntakeClient = createClient(ConnectorIntakeService, connectorIntakeTransport);
-            
-            // Create document streamer for streaming the file
-            // Type mismatch in DocumentStreamer constructor - ignoring for now
-            const documentStreamer = new DocumentStreamer(
-                'web-proxy-connector' as any, // connectorId
-                'web-proxy-api-key',   // apiKey  
-                `crawl-${Date.now()}`  // crawlId
-            );
-            
-            // Stream file directly from memory buffer - NO DISK WRITES, NO FULL FILE IN MEMORY
-            const result = await documentStreamer.streamFileBuffer(file.buffer, file.originalname);
-            
-            if (result.success) {
-                res.json({ 
-                    success: true, 
-                    message: 'File upload completed!',
-                    documentId: result.documentId,
-                    stats: { 
-                        documentsFound: 1, 
-                        documentsProcessed: 1, 
-                        documentsFailed: 0, 
-                        bytesProcessed: file.size 
-                    }
-                });
-            } else {
-                res.status(500).json({ 
-                    success: false, 
-                    error: result.error,
-                    message: `Upload failed: ${result.error}`
-                });
-            }
-        } else {
-            // Handle filePath upload
-            const { filePath } = req.body;
-            if (!filePath) {
-                return res.status(400).json({ success: false, error: 'No filePath provided' });
-            }
-            
-            // Create gRPC client to connector-intake-service
-            const connectorIntakeTransport = createGrpcTransport({
-                baseUrl: 'http://localhost:38108',
-            });
-            const connectorIntakeClient = createClient(ConnectorIntakeService, connectorIntakeTransport);
-            
-            // Create document streamer for streaming the file
-            // Type mismatch in DocumentStreamer constructor - ignoring for now
-            const documentStreamer = new DocumentStreamer(
-                'web-proxy-connector' as any, // connectorId
-                'web-proxy-api-key',   // apiKey  
-                `crawl-${Date.now()}`  // crawlId
-            );
-            
-            // Stream file from file system - NO FULL FILE IN MEMORY
-            const result = await documentStreamer.streamFile(filePath);
-            
-            if (result.success) {
-                res.json({ 
-                    success: true, 
-                    message: 'File upload completed!',
-                    documentId: result.documentId,
-                    stats: { 
-                        documentsFound: 1, 
-                        documentsProcessed: 1, 
-                        documentsFailed: 0, 
-                        bytesProcessed: 0 // TODO: Get actual file size
-                    }
-                });
-            } else {
-                res.status(500).json({ 
-                    success: false, 
-                    error: result.error,
-                    message: `Upload failed: ${result.error}`
-                });
-            }
-        }
-    } catch (error: any) {
-        console.error('Upload error:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+    res.status(503).json({
+        success: false,
+        error: 'Upload functionality temporarily disabled - filesystem connector being rewritten'
+    });
 });
 
 app.post('/api/upload/folder', async (req, res) => {
-    try {
-        const { folderPath, pattern = '**/*', workers = 1 } = req.body;
-        if (!folderPath) {
-            return res.status(400).json({ success: false, error: 'No folderPath provided' });
-        }
-        
-        // TODO: Convert to gRPC streaming and send to connector-intake-service
-        res.json({ 
-            success: true, 
-            message: 'Folder upload completed! (gRPC streaming not yet implemented)',
-            stats: { documentsFound: 0, documentsProcessed: 0, documentsFailed: 0, bytesProcessed: 0 }
-        });
-    } catch (error: any) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+    res.status(503).json({
+        success: false,
+        error: 'Upload functionality temporarily disabled - filesystem connector being rewritten'
+    });
 });
 
 app.get('/health', (req, res) => {

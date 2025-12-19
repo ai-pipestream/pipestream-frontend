@@ -17,4 +17,7 @@ catalog:
   vuetify: ^3.9.3
 
 onlyBuiltDependencies:
+  - '@bufbuild/buf'
   - '@parcel/watcher'
+  - esbuild
+  - vue-demi
