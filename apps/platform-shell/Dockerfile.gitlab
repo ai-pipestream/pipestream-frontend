@@ -1,0 +1,69 @@
+# GitLab CI Dockerfile for platform-shell
+#
+# This Dockerfile expects artifacts from the CI build stage:
+# - packages/*/dist/ (pre-built packages)
+# - packages/protobuf-forms/src/generated/ (pre-generated protos)
+# - apps/platform-shell/dist/ (pre-built backend)
+# - apps/platform-shell/public/ (pre-built frontend)
+#
+# Build: docker build -f apps/platform-shell/Dockerfile.gitlab -t platform-shell .
+
+FROM node:22-alpine AS runtime
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10 --activate
+
+# Create app user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+WORKDIR /app
+
+# Copy monorepo workspace config
+COPY --chown=nodejs:nodejs pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
+
+# Copy package.json files for workspace
+COPY --chown=nodejs:nodejs packages/connector-shared/package.json ./packages/connector-shared/
+COPY --chown=nodejs:nodejs packages/protobuf-forms/package.json ./packages/protobuf-forms/
+COPY --chown=nodejs:nodejs apps/platform-shell/package.json ./apps/platform-shell/
+
+# Install only production dependencies
+RUN pnpm install --frozen-lockfile --prod && \
+    pnpm store prune && \
+    rm -rf /root/.local/share/pnpm/store
+
+# Copy pre-built packages from CI artifacts
+COPY --chown=nodejs:nodejs packages/connector-shared/dist ./packages/connector-shared/dist
+COPY --chown=nodejs:nodejs packages/protobuf-forms/dist ./packages/protobuf-forms/dist
+COPY --chown=nodejs:nodejs packages/protobuf-forms/src/generated ./packages/protobuf-forms/src/generated
+COPY --chown=nodejs:nodejs packages/shared-components/dist ./packages/shared-components/dist
+COPY --chown=nodejs:nodejs packages/shared-nav/dist ./packages/shared-nav/dist
+
+# Copy pre-built backend from CI artifacts
+COPY --chown=nodejs:nodejs apps/platform-shell/dist ./apps/platform-shell/dist
+
+# Copy pre-built frontend from CI artifacts
+COPY --chown=nodejs:nodejs apps/platform-shell/public ./apps/platform-shell/public
+
+# Switch to non-root user
+USER nodejs
+
+# Set working directory to app
+WORKDIR /app/apps/platform-shell
+
+# Environment variables with sensible defaults
+ENV NODE_ENV=production
+ENV PORT=38106
+ENV VITE_PORT=33000
+ENV PLATFORM_REGISTRATION_HOST=platform-registration-service
+ENV PLATFORM_REGISTRATION_PORT=38101
+
+# Expose backend port
+EXPOSE 38106
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:${PORT}/', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+# Run the application
+CMD ["node", "dist/index.js"]
