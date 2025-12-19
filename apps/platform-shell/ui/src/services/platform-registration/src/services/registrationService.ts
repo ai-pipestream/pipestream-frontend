@@ -6,8 +6,7 @@
 
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
-import type { ServiceDetails, ServiceListResponse } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+import { PlatformRegistrationService, type ListServicesResponse, type ServiceInfo } from '@ai-pipestream/protobuf-forms/generated'
 
 // Create the transport - uses same origin to reach /connect/* through Traefik
 export const transport = createConnectTransport({
@@ -16,7 +15,7 @@ export const transport = createConnectTransport({
 })
 
 // Create the client
-export const registrationClient = createClient(PlatformRegistration, transport)
+export const registrationClient = createClient(PlatformRegistrationService, transport)
 
 // Service interface types (temporary until proto definitions are available)
 export interface ServiceRegistration {
@@ -68,15 +67,15 @@ export const registrationService = {
   async listServices(): Promise<RegisteredService[]> {
     try {
       console.log('Calling listServices via gRPC...')
-      const response = await registrationClient.listServices({}) as unknown as ServiceListResponse
+      const response = await registrationClient.listServices({}) as ListServicesResponse
       console.log('Received response:', response)
-      
+
       if (!response.services || response.services.length === 0) {
         console.log('No services returned from backend')
         return []
       }
-      
-      const mappedServices = response.services.map((service: ServiceDetails) => ({
+
+      const mappedServices = response.services.map((service: ServiceInfo) => ({
         id: service.serviceId,
         name: service.serviceName,
         host: service.host || 'localhost',
@@ -84,11 +83,11 @@ export const registrationService = {
         type: 'GRPC' as const, // Assuming GRPC for now
         status: (service.isHealthy ? 'HEALTHY' : 'UNHEALTHY') as 'HEALTHY' | 'UNHEALTHY',
         registeredAt: service.registeredAt ? new Date(
-          Number(service.registeredAt.seconds) * 1000 + 
+          Number(service.registeredAt.seconds) * 1000 +
           Number(service.registeredAt.nanos) / 1000000
         ).toISOString() : undefined,
         lastHealthCheck: service.lastHealthCheck ? new Date(
-          Number(service.lastHealthCheck.seconds) * 1000 + 
+          Number(service.lastHealthCheck.seconds) * 1000 +
           Number(service.lastHealthCheck.nanos) / 1000000
         ).toISOString() : undefined
       }))

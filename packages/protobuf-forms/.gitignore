@@ -5,6 +5,8 @@
 # Protobuf sources and generated stubs (synced/generated at build time)
 /proto/
 /src/generated/
+/.proto-temp/
+/buf.lock
 
 # Logs
 npm-debug.log*

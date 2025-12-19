@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@ai-pipestream/connector-shared": "workspace:*",
-    "@ai-pipestream/grpc-stubs": "catalog:",
     "@ai-pipestream/protobuf-forms": "workspace:*",
     "@ai-pipestream/shared-components": "workspace:*",
     "@ai-pipestream/shared-nav": "workspace:*",

@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted, watch, computed, shallowRef } from 'vue';
 import { createClient, ConnectError, Code } from '@connectrpc/connect';
-import { Health, HealthCheckResponse_ServingStatus as ServingStatus, type HealthCheckResponse } from '@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb';
+import { Health, HealthCheckResponse_ServingStatus as ServingStatus, type HealthCheckResponse } from '@ai-pipestream/protobuf-forms/generated';
 import { createConnectTransport } from '@connectrpc/connect-web';
 
 //##############################################################################

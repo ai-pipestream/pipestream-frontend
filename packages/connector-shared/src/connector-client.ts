@@ -3,8 +3,8 @@ import { createGrpcTransport } from '@connectrpc/connect-node';
 import {
   ConnectorIntakeService,
   ConnectorAdminService,
-  type ConnectorConfig,
-} from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb';
+  type ConnectorRegistration,
+} from '@ai-pipestream/protobuf-forms/generated';
 import chalk from 'chalk';
 
 // Configuration
@@ -32,7 +32,7 @@ const connectorAdminClient = createClient(ConnectorAdminService, connectorTransp
 export class ConnectorClient {
   private connectorId: string | null = null;
   private apiKey: string | null = null;
-  private connectorConfig: ConnectorConfig | null = null;
+  private connectorConfig: ConnectorRegistration | null = null;
 
   /**
    * Register or get existing connector
@@ -51,10 +51,14 @@ export class ConnectorClient {
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
       ]);
 
-      console.log(chalk.green(`✓ Using existing connector: ${connector.connectorId}`));
-      this.connectorId = connector.connectorId;
-      this.apiKey = connector.apiKey;
-      return { connectorId: connector.connectorId, apiKey: connector.apiKey };
+      const registration = connector.connector;
+      if (!registration) {
+        throw new Error('Connector registration not found in response');
+      }
+      console.log(chalk.green(`✓ Using existing connector: ${registration.connectorId}`));
+      this.connectorId = registration.connectorId;
+      this.apiKey = registration.apiKey;
+      return { connectorId: registration.connectorId, apiKey: registration.apiKey };
     } catch (error: any) {
       // Connector doesn't exist, register it
       if (error.code === 'NOT_FOUND' || error.message?.includes('not found') || error.message === 'Timeout') {

@@ -110,7 +110,7 @@
 import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAccount, inactivateAccount as inactivateAccountService, updateAccount as updateAccountService } from '../services/accountClient'
-import type { Account } from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb'
+import type { Account } from '@ai-pipestream/protobuf-forms/generated'
 
 const router = useRouter()
 

@@ -24,7 +24,7 @@ export default defineConfig({
       external: [
         'vue',
         'vuetify',
-        '@ai-pipestream/grpc-stubs',
+        '@ai-pipestream/protobuf-forms',
         /^vuetify/,
         /^@mdi/
       ],

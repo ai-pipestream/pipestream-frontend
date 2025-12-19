@@ -10,20 +10,16 @@ import {
   ListConnectorsRequestSchema,
   SetConnectorStatusRequestSchema,
   DeleteConnectorRequestSchema,
-  RotateApiKeyRequestSchema
-} from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb'
-
-// Type imports for TypeScript type checking only
-import type {
-  ConnectorRegistration,
-  RegisterConnectorRequest,
-  UpdateConnectorRequest,
-  GetConnectorRequest,
-  ListConnectorsRequest,
-  SetConnectorStatusRequest,
-  DeleteConnectorRequest,
-  RotateApiKeyRequest
-} from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb'
+  RotateApiKeyRequestSchema,
+  type ConnectorRegistration,
+  type RegisterConnectorRequest,
+  type UpdateConnectorRequest,
+  type GetConnectorRequest,
+  type ListConnectorsRequest,
+  type SetConnectorStatusRequest,
+  type DeleteConnectorRequest,
+  type RotateApiKeyRequest
+} from '@ai-pipestream/protobuf-forms/generated'
 
 // Create transport to connect through web-proxy using binary format
 // The web-proxy will route to connector-service based on the service definitions

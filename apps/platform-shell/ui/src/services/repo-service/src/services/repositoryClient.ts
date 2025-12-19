@@ -1,15 +1,19 @@
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
 import { create } from '@bufbuild/protobuf'
-import { PipeDocSchema, TagsSchema, BlobSchema, BlobBagSchema, SearchMetadataSchema } from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
 import {
   PipeDocService,
-  // ProcessRequestRepositoryService no longer exists after refactoring
-  SearchMetadataSchema
-} from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'
-
-// Type imports for TypeScript type checking only
-import type { PipeDoc, Tags, Blob, BlobBag, SearchMetadata } from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'
+  PipeDocSchema,
+  TagsSchema,
+  BlobSchema,
+  BlobBagSchema,
+  SearchMetadataSchema,
+  type PipeDoc,
+  type Tags,
+  type Blob,
+  type BlobBag,
+  type SearchMetadata
+} from '@ai-pipestream/protobuf-forms/generated'
 
 // Create transport to connect through web-proxy using binary format
 // The web-proxy will route to repository-service based on the service definitions

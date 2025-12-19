@@ -1,15 +1,17 @@
 import { ConnectRouter, Code, ConnectError } from "@connectrpc/connect";
 import { createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { PipeStepProcessor } from "@ai-pipestream/grpc-stubs/dist/module/module_service_pb";
-import { MappingService } from "@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb";
-import { PlatformRegistration } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
-import { Health } from "@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb";
-import { ShellService } from "@ai-pipestream/grpc-stubs/dist/frontend/shell_service_pb";
-import { NodeUploadService } from "@ai-pipestream/grpc-stubs/dist/repository/filesystem/upload/upload_service_pb";
-import { PipeDocService } from "@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb";
-import { AccountService } from "@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb";
-import { ConnectorAdminService } from "@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb";
+import {
+  PipeStepProcessorService,
+  MappingService,
+  PlatformRegistrationService,
+  Health,
+  ShellService,
+  NodeUploadService,
+  PipeDocService,
+  AccountService,
+  ConnectorAdminService
+} from "@ai-pipestream/protobuf-forms/generated";
 import { createDynamicTransport, resolveService } from "../lib/serviceResolver.js";
 
 // Get platform-registration-service URL from environment or use default
@@ -54,7 +56,7 @@ export default (router: ConnectRouter) => {
       const nowIso = () => new Date().toISOString();
 
       // Fetch services from platform-registration as source of truth
-      const prClient = createClient(PlatformRegistration, registrationTransport);
+      const prClient = createClient(PlatformRegistrationService, registrationTransport);
       let services: Array<{ serviceName: string; tags: string[] }>; 
       try {
         const list = await prClient.listServices({});
@@ -186,6 +188,20 @@ export default (router: ConnectRouter) => {
 
   // Node Upload Service proxy
   router.service(NodeUploadService, {
+    // Simple unary upload (for smaller documents)
+    uploadFilesystemPipeDoc(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "repository-service";
+      const transport = createDynamicTransport(target);
+      const client = createClient(NodeUploadService, transport);
+      return client.uploadFilesystemPipeDoc(req);
+    },
+    getUploadedDocument(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "repository-service";
+      const transport = createDynamicTransport(target);
+      const client = createClient(NodeUploadService, transport);
+      return client.getUploadedDocument(req);
+    },
+    // Chunked upload flow (for large files with progress/resumability)
     initiateUpload(req: any, context: any) {
       const target = context.requestHeader.get("x-target-backend") || "repository-service";
       const transport = createDynamicTransport(target);
@@ -221,14 +237,15 @@ export default (router: ConnectRouter) => {
   });
   
   // Module processor proxy (dynamic)
-  router.service(PipeStepProcessor, {
+  // Note: testProcessData was removed - use processData with is_test=true in request
+  router.service(PipeStepProcessorService, {
     getServiceRegistration(req: any, context: any) {
       const targetBackend = context.requestHeader.get("x-target-backend");
       if (!targetBackend) {
         throw new ConnectError("x-target-backend header is required for module requests", Code.InvalidArgument);
       }
       const transport = createDynamicTransport(targetBackend);
-      const client = createClient(PipeStepProcessor, transport);
+      const client = createClient(PipeStepProcessorService, transport);
       return client.getServiceRegistration(req);
     },
     processData(req: any, context: any) {
@@ -237,76 +254,61 @@ export default (router: ConnectRouter) => {
         throw new ConnectError("x-target-backend header is required for module requests", Code.InvalidArgument);
       }
       const transport = createDynamicTransport(targetBackend);
-      const client = createClient(PipeStepProcessor, transport);
+      const client = createClient(PipeStepProcessorService, transport);
       return client.processData(req);
-    },
-    testProcessData(req: any, context: any) {
-      const targetBackend = context.requestHeader.get("x-target-backend");
-      if (!targetBackend) {
-        throw new ConnectError("x-target-backend header is required for module requests", Code.InvalidArgument);
-      }
-      const transport = createDynamicTransport(targetBackend);
-      const client = createClient(PipeStepProcessor, transport);
-      return client.testProcessData(req);
     }
   });
   
   // Platform Registration Service proxy
-  router.service(PlatformRegistration, {
-    async *registerService(req: any) {
-      console.log("[Connect] Proxying registerService to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
-      for await (const event of client.registerService(req)) {
+  // Note: register/unregister are now consolidated (handle both services and modules)
+  router.service(PlatformRegistrationService, {
+    async *register(req: any) {
+      console.log("[Connect] Proxying register to platform-registration-service");
+      const client = createClient(PlatformRegistrationService, registrationTransport);
+      for await (const event of client.register(req)) {
         yield event;
       }
     },
-    async *registerModule(req: any) {
-      console.log("[Connect] Proxying registerModule to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
-      for await (const event of client.registerModule(req)) {
-        yield event;
-      }
-    },
-    unregisterService(req: any) {
-      console.log("[Connect] Proxying unregisterService to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
-      return client.unregisterService(req);
-    },
-    unregisterModule(req: any) {
-      console.log("[Connect] Proxying unregisterModule to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
-      return client.unregisterModule(req);
+    unregister(req: any) {
+      console.log("[Connect] Proxying unregister to platform-registration-service");
+      const client = createClient(PlatformRegistrationService, registrationTransport);
+      return client.unregister(req);
     },
     listServices(req: any) {
       // console.log("[Connect] Proxying listServices to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
+      const client = createClient(PlatformRegistrationService, registrationTransport);
       return client.listServices(req);
     },
-    listModules(req: any) {
-      // console.log("[Connect] Proxying listModules to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
-      return client.listModules(req);
+    listPlatformModules(req: any) {
+      // console.log("[Connect] Proxying listPlatformModules to platform-registration-service");
+      const client = createClient(PlatformRegistrationService, registrationTransport);
+      return client.listPlatformModules(req);
     },
     getService(req: any) {
       console.log("[Connect] Proxying getService to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
+      const client = createClient(PlatformRegistrationService, registrationTransport);
       return client.getService(req);
     },
     getModule(req: any) {
       console.log("[Connect] Proxying getModule to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
+      const client = createClient(PlatformRegistrationService, registrationTransport);
       return client.getModule(req);
+    },
+    resolveService(req: any) {
+      console.log("[Connect] Proxying resolveService to platform-registration-service");
+      const client = createClient(PlatformRegistrationService, registrationTransport);
+      return client.resolveService(req);
     },
     async *watchServices(req: any) {
       console.log("[Connect] Proxying watchServices to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
+      const client = createClient(PlatformRegistrationService, registrationTransport);
       for await (const event of client.watchServices(req)) {
         yield event;
       }
     },
     async *watchModules(req: any) {
       console.log("[Connect] Proxying watchModules to platform-registration-service");
-      const client = createClient(PlatformRegistration, registrationTransport);
+      const client = createClient(PlatformRegistrationService, registrationTransport);
       for await (const event of client.watchModules(req)) {
         yield event;
       }

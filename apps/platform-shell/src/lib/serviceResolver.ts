@@ -1,10 +1,10 @@
 import { createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { PlatformRegistration, ServiceDetails } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
+import { PlatformRegistrationService, type GetServiceResponse } from "@ai-pipestream/protobuf-forms/generated";
 
 // This map holds the live state of all healthy, registered services.
 // It is populated by the WatchServices stream.
-const serviceRegistry = new Map<string, ServiceDetails>();
+const serviceRegistry = new Map<string, GetServiceResponse>();
 
 // Get platform-registration-service URL from environment or use default
 const REGISTRATION_HOST = process.env.PLATFORM_REGISTRATION_HOST || 'localhost';
@@ -19,7 +19,7 @@ const registrationTransport = createGrpcTransport({
   idleConnectionTimeoutMs: 1000 * 60 * 60, // 1 hour for idle connections
 });
 
-const registrationClient = createClient(PlatformRegistration, registrationTransport);
+const registrationClient = createClient(PlatformRegistrationService, registrationTransport);
 
 /**
  * Watches the platform-registration-service for real-time updates of all
@@ -30,7 +30,7 @@ async function watchAndCacheServices() {
   try {
     const stream = registrationClient.watchServices({});
     for await (const response of stream) {
-      const newRegistry = new Map<string, ServiceDetails>();
+      const newRegistry = new Map<string, GetServiceResponse>();
       for (const service of response.services) {
         newRegistry.set(service.serviceName, service);
       }

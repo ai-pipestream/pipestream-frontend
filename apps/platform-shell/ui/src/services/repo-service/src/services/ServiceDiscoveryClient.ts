@@ -7,8 +7,7 @@
 
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
-import type { ServiceDetails, ServiceListResponse } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+import { PlatformRegistrationService, type ServiceInfo, type ListServicesResponse } from '@ai-pipestream/protobuf-forms/generated'
 
 // Service interface types
 export interface DiscoveredService {
@@ -47,7 +46,7 @@ export interface ServiceDiscoveryOptions {
  * Generic Service Discovery Client
  */
 export class ServiceDiscoveryClient {
-  private platformRegistrationClient: ReturnType<typeof createClient<typeof PlatformRegistration>>
+  private platformRegistrationClient: ReturnType<typeof createClient<typeof PlatformRegistrationService>>
   private cache: DiscoveredService[] = []
   private lastCacheUpdate: number = 0
   private options: Required<ServiceDiscoveryOptions>
@@ -67,7 +66,7 @@ export class ServiceDiscoveryClient {
     })
 
     // Create the platform registration client
-    this.platformRegistrationClient = createClient(PlatformRegistration, transport)
+    this.platformRegistrationClient = createClient(PlatformRegistrationService, transport)
   }
 
   /**
@@ -87,7 +86,7 @@ export class ServiceDiscoveryClient {
         console.log('[ServiceDiscovery] Discovering services via platform-registration...')
       }
       
-      const response = await this.platformRegistrationClient.listServices({}) as ServiceListResponse
+      const response = await this.platformRegistrationClient.listServices({}) as ListServicesResponse
       
       if (this.options.debug) {
         console.log('[ServiceDiscovery] Received response:', response)
@@ -102,7 +101,7 @@ export class ServiceDiscoveryClient {
         return []
       }
       
-      const discoveredServices = response.services.map((service: ServiceDetails) => ({
+      const discoveredServices = response.services.map((service: ServiceInfo) => ({
         id: service.serviceId,
         name: service.serviceName,
         host: service.host || 'localhost',

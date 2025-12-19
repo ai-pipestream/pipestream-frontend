@@ -28,8 +28,8 @@ export default defineConfig({
         '@bufbuild/protobuf',
         '@connectrpc/connect',
         '@connectrpc/connect-web',
-        '@ai-pipestream/grpc-stubs',
-        /^@ai-pipestream\/grpc-stubs\//,
+        '@ai-pipestream/protobuf-forms',
+        /^@ai-pipestream\/protobuf-forms\//,
         /^vuetify/,
         /^@mdi/
       ],

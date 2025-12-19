@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { createClient } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-web';
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb';
+import { PlatformRegistrationService } from '@ai-pipestream/protobuf-forms/generated';
 
 const availableServices = ref<Set<string>>(new Set());
 const availableModules = ref<Set<string>>(new Set());
@@ -29,7 +29,7 @@ const initializeStreams = () => {
         useBinaryFormat: true
       });
 
-      const client = createClient(PlatformRegistration, transport);
+      const client = createClient(PlatformRegistrationService, transport);
 
       const serviceStream = client.watchServices({}, {
         signal: serviceAbortController!.signal
@@ -59,7 +59,7 @@ const initializeStreams = () => {
         useBinaryFormat: true
       });
 
-      const client = createClient(PlatformRegistration, transport);
+      const client = createClient(PlatformRegistrationService, transport);
 
       const response = await client.listModules({}, {
         signal: moduleAbortController!.signal

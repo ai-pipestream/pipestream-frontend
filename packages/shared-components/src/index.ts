@@ -2,7 +2,7 @@
  * @ai-pipestream/shared-components
  *
  * Shared Vue 3 + Vuetify 3 components for the Pipeline platform.
- * These components are designed to work with @ai-pipestream/grpc-stubs types
+ * These components are designed to work with @ai-pipestream/protobuf-forms/generated types
  * and can be used across all frontend applications.
  */
 

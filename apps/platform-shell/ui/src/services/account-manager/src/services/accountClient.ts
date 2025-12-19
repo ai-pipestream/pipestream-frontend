@@ -10,20 +10,16 @@ import {
   ReactivateAccountRequestSchema,
   ListAccountsRequestSchema,
   ListAccountsResponseSchema,
-  UpdateAccountRequestSchema
-} from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb'
-
-// Type imports for TypeScript type checking only
-import type {
-  Account,
-  CreateAccountRequest,
-  GetAccountRequest,
-  InactivateAccountRequest,
-  ReactivateAccountRequest,
-  ListAccountsRequest,
-  ListAccountsResponse,
-  UpdateAccountRequest
-} from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb'
+  UpdateAccountRequestSchema,
+  type Account,
+  type CreateAccountRequest,
+  type GetAccountRequest,
+  type InactivateAccountRequest,
+  type ReactivateAccountRequest,
+  type ListAccountsRequest,
+  type ListAccountsResponse,
+  type UpdateAccountRequest
+} from '@ai-pipestream/protobuf-forms/generated'
 
 // Create transport to connect through web-proxy using binary format
 // The web-proxy will route to account-manager based on the service definitions

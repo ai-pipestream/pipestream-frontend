@@ -61,7 +61,7 @@
     "@connectrpc/connect": "catalog:",
     "@connectrpc/connect-web": "catalog:",
     "@connectrpc/connect-node": "catalog:",
-    "@ai-pipestream/grpc-stubs": "catalog:",
+    "@ai-pipestream/protobuf-forms": "workspace:*",
     "chalk": "^5.6.2",
     "mime-types": "^3.0.1"
   },

@@ -339,7 +339,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { PipeDoc } from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
+import type { PipeDoc } from '@ai-pipestream/protobuf-forms/generated'
 
 interface Props {
   document: PipeDoc | any  // Accept protobuf or plain object

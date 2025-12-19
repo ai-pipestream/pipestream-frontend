@@ -237,7 +237,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { ApplyMappingResponse } from '@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb'
+import type { ApplyMappingResponse } from '@ai-pipestream/protobuf-forms/generated'
 
 interface Props {
   response: ApplyMappingResponse | any  // Accept protobuf or plain object

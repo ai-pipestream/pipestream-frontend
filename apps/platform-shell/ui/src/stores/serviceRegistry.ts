@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { createClient, ConnectError, Code } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+import { PlatformRegistrationService } from '@ai-pipestream/protobuf-forms/generated'
 
 export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
   // State
@@ -32,7 +32,7 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
         useBinaryFormat: true
       })
 
-      const client = createClient(PlatformRegistration, transport)
+      const client = createClient(PlatformRegistrationService, transport)
 
       for await (const response of client.watchServices({}, {
         signal: serviceAbortController.signal,
@@ -93,7 +93,7 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
         useBinaryFormat: true
       })
 
-      const client = createClient(PlatformRegistration, transport)
+      const client = createClient(PlatformRegistrationService, transport)
 
       for await (const response of client.watchModules({}, {
         signal: moduleAbortController.signal,

@@ -304,7 +304,7 @@ import {
   PipeDocSchema,
   SearchMetadataSchema,
   type PipeDoc
-} from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
+} from '@ai-pipestream/protobuf-forms/generated'
 
 interface Props {
   document?: PipeDoc | null

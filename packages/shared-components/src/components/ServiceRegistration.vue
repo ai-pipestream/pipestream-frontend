@@ -388,10 +388,10 @@ import { create } from '@bufbuild/protobuf'
 // TimestampSchema not needed; use plain object for MessageInit<Timestamp>
 // These will be uncommented when backend is ready
 // import { createClient } from '@connectrpc/connect'
-// import { ServiceRegistration, createGrpcWebTransport } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+// import { PlatformRegistrationService } from '@ai-pipestream/protobuf-forms/generated'
 import {
-  ServiceRegistrationRequestSchema
-} from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
+  RegisterRequestSchema
+} from '@ai-pipestream/protobuf-forms/generated'
 
 interface Props {
   endpoint?: string
@@ -548,7 +548,7 @@ const registerService = async () => {
   
   try {
     // Create proper protobuf message
-    const serviceRegistrationRequest = create(ServiceRegistrationRequestSchema, {
+    const serviceRegistrationRequest = create(RegisterRequestSchema, {
       serviceName: serviceInfo.serviceName,
       host: serviceInfo.host,
       port: serviceInfo.port,

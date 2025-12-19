@@ -221,12 +221,10 @@ import { ref } from 'vue'
 import { create } from '@bufbuild/protobuf'
 import {
   ApplyMappingRequestSchema,
-  MappingRuleSchema
-} from '@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb'
-import {
+  MappingRuleSchema,
   PipeDocSchema,
   SearchMetadataSchema
-} from '@ai-pipestream/grpc-stubs/dist/core/pipeline_core_types_pb'
+} from '@ai-pipestream/protobuf-forms/generated'
 // TODO: Re-enable when protobuf-forms is integrated
 // import { ProtobufForm } from '@pipeline/protobuf-forms/vue'
 

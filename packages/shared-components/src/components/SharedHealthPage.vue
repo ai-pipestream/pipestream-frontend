@@ -98,8 +98,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useShellHealth } from '../composables/useShellHealth'
-import { HealthCheckResponse_ServingStatus as ServingStatus } from '@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb'
-import type { ServiceHealthUpdate } from '@ai-pipestream/grpc-stubs/dist/frontend/shell_service_pb'
+import { HealthCheckResponse_ServingStatus as ServingStatus, type WatchHealthResponse } from '@ai-pipestream/protobuf-forms/generated'
 
 const { updates, error, isConnected, isUsingFallback, reconnectAttempts, refresh } = useShellHealth()
 const refreshing = ref(false)
@@ -164,7 +163,7 @@ function getStatusText(status: ServingStatus): string {
   }
 }
 
-function getCardColor(update: ServiceHealthUpdate): string {
+function getCardColor(update: WatchHealthResponse): string {
   switch (update.status) {
     case ServingStatus.SERVING:
       return 'success-lighten-5'

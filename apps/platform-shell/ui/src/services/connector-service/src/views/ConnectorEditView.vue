@@ -148,7 +148,7 @@
 import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getConnector, updateConnector as updateConnectorService, setConnectorStatus as setConnectorStatusService } from '../services/connectorClient'
-import type { ConnectorRegistration } from '@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb'
+import type { ConnectorRegistration } from '@ai-pipestream/protobuf-forms/generated'
 
 const router = useRouter()
 

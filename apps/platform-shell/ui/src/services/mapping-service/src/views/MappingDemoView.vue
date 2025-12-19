@@ -70,11 +70,11 @@ import { ref } from 'vue'
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
 import { create } from '@bufbuild/protobuf'
-import { 
-  MappingService, 
-  ApplyMappingRequestSchema, 
+import {
+  MappingService,
+  ApplyMappingRequestSchema,
   ApplyMappingResponseSchema,
-} from '@ai-pipestream/grpc-stubs/dist/mapping-service/mapping_service_pb'
+} from '@ai-pipestream/protobuf-forms/generated'
 import { PipeDocPreview } from '@ai-pipestream/shared-components'
 
 const loading = ref(false)

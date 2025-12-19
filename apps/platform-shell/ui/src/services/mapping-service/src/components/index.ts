@@ -12,4 +12,4 @@ export {
 } from '@ai-pipestream/shared-components'
 
 // Re-export types that components might need
-export type { PipeDoc } from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'
+export type { PipeDoc } from '@ai-pipestream/protobuf-forms/generated'

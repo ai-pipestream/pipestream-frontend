@@ -1,7 +1,6 @@
 import { createClient, type Transport } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistration } from '@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb'
-import { PipeStepProcessor } from '@ai-pipestream/grpc-stubs/dist/module/module_service_pb'
+import { PlatformRegistrationService, PipeStepProcessorService } from '@ai-pipestream/protobuf-forms/generated'
 
 // Create a browser transport pointing to the web-proxy Connect API
 export function createWebProxyTransport(base?: string): Transport {
@@ -16,7 +15,7 @@ export function createWebProxyTransport(base?: string): Transport {
 // Note: to avoid leaking generated types in public d.ts (TS2742),
 // we keep return types broad.
 export function createPlatformRegistrationClient(transport?: Transport): any {
-  return createClient(PlatformRegistration, transport ?? createWebProxyTransport())
+  return createClient(PlatformRegistrationService, transport ?? createWebProxyTransport())
 }
 
 // PipeStepProcessor requests must set x-target-backend header to the module service name
@@ -32,5 +31,5 @@ export function createPipeStepProcessorClient(moduleServiceName: string, base?: 
       }
     ]
   })
-  return createClient(PipeStepProcessor, transport)
+  return createClient(PipeStepProcessorService, transport)
 }

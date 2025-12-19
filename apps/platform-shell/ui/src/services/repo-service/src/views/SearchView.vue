@@ -166,7 +166,7 @@ import { storeToRefs } from 'pinia'
 import { useDocumentStore } from '../stores/documentStore'
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { FilesystemService } from '@ai-pipestream/grpc-stubs/dist/repository/filesystem/filesystem_service_pb'
+import { FilesystemService } from '@ai-pipestream/protobuf-forms/generated'
 
 const props = defineProps<{
   initialQuery?: string

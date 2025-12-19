@@ -56,7 +56,7 @@
 import { ref } from 'vue'
 import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PipeDocService } from '@ai-pipestream/grpc-stubs/dist/repository/pipedoc/pipedoc_service_pb'
+import { PipeDocService } from '@ai-pipestream/protobuf-forms/generated'
 
 interface Props {
   target?: string

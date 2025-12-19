@@ -48,7 +48,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@ai-pipestream/grpc-stubs": "catalog:",
+    "@ai-pipestream/protobuf-forms": "workspace:*",
     "vue": "catalog:"
   },
   "peerDependencies": {

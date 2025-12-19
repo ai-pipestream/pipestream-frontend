@@ -52,7 +52,7 @@
     "@bufbuild/protobuf": "catalog:",
     "@connectrpc/connect": "catalog:",
     "@connectrpc/connect-web": "catalog:",
-    "@ai-pipestream/grpc-stubs": "catalog:",
+    "@ai-pipestream/protobuf-forms": "workspace:*",
     "@jsonforms/core": "catalog:",
     "@jsonforms/vue": "catalog:",
     "@jsonforms/vue-vuetify": "catalog:",

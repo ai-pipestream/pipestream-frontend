@@ -179,7 +179,7 @@ import { ref, onMounted, computed } from 'vue'
 import VuetifyConfigCard from './components/VuetifyConfigCard.vue'
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from '@connectrpc/connect-web';
-import { PipeStepProcessor } from "@ai-pipestream/grpc-stubs/dist/module/module_service_pb";
+import { PipeStepProcessorService } from "@ai-pipestream/protobuf-forms/generated";
 
 const activeTab = ref('config')
 const schema = ref(null)

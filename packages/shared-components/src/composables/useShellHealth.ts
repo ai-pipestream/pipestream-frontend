@@ -1,5 +1,4 @@
-import { ServiceHealthUpdateSchema, ShellService, type ServiceHealthUpdate } from '@ai-pipestream/grpc-stubs/dist/frontend/shell_service_pb'
-import { HealthCheckResponse_ServingStatus as ServingStatus } from '@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb'
+import { WatchHealthResponseSchema, ShellService, type WatchHealthResponse, HealthCheckResponse_ServingStatus as ServingStatus } from '@ai-pipestream/protobuf-forms/generated'
 import { create } from '@bufbuild/protobuf'
 import { Code, ConnectError, createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
@@ -17,7 +16,7 @@ interface HealthSnapshot {
 
 // Singleton instance to prevent multiple streams during HMR
 class ShellHealthManager {
-  private updates = shallowRef<Map<string, ServiceHealthUpdate>>(new Map())
+  private updates = shallowRef<Map<string, WatchHealthResponse>>(new Map())
   private isConnected = ref(false)
   private isUsingFallback = ref(false)
   private error = ref<string | null>(null)
@@ -59,7 +58,7 @@ class ShellHealthManager {
       }
 
       const snapshot: HealthSnapshot = await response.json()
-      const fallbackUpdates = new Map<string, ServiceHealthUpdate>()
+      const fallbackUpdates = new Map<string, WatchHealthResponse>()
 
       for (const service of snapshot.services) {
         let status: ServingStatus
@@ -75,13 +74,13 @@ class ShellHealthManager {
             break
         }
 
-        fallbackUpdates.set(service.name, create(ServiceHealthUpdateSchema, {
+        fallbackUpdates.set(service.name, create(WatchHealthResponseSchema, {
           serviceName: service.name,
           displayName: service.name,
           target: service.target,
           status,
           observedAt: snapshot.checkedAt
-        }) as ServiceHealthUpdate)
+        }) as WatchHealthResponse)
       }
 
       this.updates.value = fallbackUpdates
@@ -198,7 +197,7 @@ class ShellHealthManager {
 
   // Public API
   addReference(): {
-    updates: Ref<Map<string, ServiceHealthUpdate>>
+    updates: Ref<Map<string, WatchHealthResponse>>
     isConnected: Ref<boolean>
     isUsingFallback: Ref<boolean>
     error: Ref<string | null>

@@ -4,10 +4,8 @@ import multer from 'multer';
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 import { createClient } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { ConnectorIntakeService } from "@ai-pipestream/grpc-stubs/dist/module/connectors/connector_intake_service_pb";
+import { ConnectorIntakeService, Health, PlatformRegistrationService } from "@ai-pipestream/protobuf-forms/generated";
 import { DocumentStreamer } from "@ai-pipestream/connector-shared";
-import { Health } from "@ai-pipestream/grpc-stubs/dist/grpc/health/v1/health_pb";
-import { PlatformRegistration } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
 import { createDynamicTransport, clearServiceRegistry } from './lib/serviceResolver.js';
 import { createEmptyRegistryGroups, sortEntries, type RegistryEntry } from './models/registry.js';
 import connectRoutes from './routes/connectRoutes.js';
@@ -80,11 +78,11 @@ app.get('/connect/system-nav/menu-items.json', async (req, res) => {
         const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '38101';
         const REGISTRATION_URL = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
         const transport = createGrpcTransport({ baseUrl: REGISTRATION_URL, idleConnectionTimeoutMs: 1000 * 60 * 60 });
-        const client = createClient(PlatformRegistration, transport);
+        const client = createClient(PlatformRegistrationService, transport);
 
         const [servicesResp, modulesResp] = await Promise.all([
             client.listServices({}),
-            client.listModules({})
+            client.listPlatformModules({})
         ]);
 
         const SERVICE_UI_PATH: Record<string, string> = {

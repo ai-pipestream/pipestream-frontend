@@ -2,6 +2,7 @@ version: v2
 managed:
   enabled: true
 plugins:
+  # Generate message types AND service descriptors (Connect 2.x only needs protoc-gen-es)
   - local: protoc-gen-es
     out: src/generated
     opt:
