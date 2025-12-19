@@ -27,8 +27,10 @@ COPY --chown=nodejs:nodejs packages/connector-shared/package.json ./packages/con
 COPY --chown=nodejs:nodejs packages/protobuf-forms/package.json ./packages/protobuf-forms/
 COPY --chown=nodejs:nodejs apps/platform-shell/package.json ./apps/platform-shell/
 
-# Install only production dependencies
+# Install production dependencies + tsx for TypeScript runtime
+# (protobuf-forms exports TypeScript files directly)
 RUN pnpm install --frozen-lockfile --prod && \
+    npm install -g tsx && \
     pnpm store prune && \
     rm -rf /root/.local/share/pnpm/store
 
@@ -65,5 +67,5 @@ EXPOSE 38106
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:${PORT}/', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
-# Run the application
-CMD ["node", "dist/index.js"]
+# Run the application with tsx (needed for TypeScript proto imports)
+CMD ["tsx", "dist/index.js"]
