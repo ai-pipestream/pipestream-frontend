@@ -87,6 +87,39 @@ pnpm run dev:all
 docker build -f apps/platform-shell/Dockerfile -t platform-shell:local .
 ```
 
+### Push to GitLab Container Registry
+
+```bash
+# Login to GitLab Container Registry
+docker login registry.gitlab.yourcompany.com
+# Enter your GitLab username and personal access token (with read_registry, write_registry scopes)
+
+# Tag for GitLab registry
+# Format: registry.gitlab.yourcompany.com/<group>/<project>/<image>:<tag>
+docker tag platform-shell:local \
+  registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+
+# Push
+docker push registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+```
+
+#### Multi-arch Build and Push
+
+For ARM64 support (e.g., Apple Silicon, AWS Graviton):
+
+```bash
+# Create a builder with multi-arch support
+docker buildx create --name multiarch --use
+
+# Build and push multi-arch image directly
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --push \
+  -t registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest \
+  -f apps/platform-shell/Dockerfile \
+  .
+```
+
 ### Run the Container
 
 ```bash
@@ -162,6 +195,50 @@ The GitLab CI pipeline runs these stages:
 2. **package**: Build multi-arch Docker image (amd64 + arm64)
 3. **test**: Run Trivy CVE scan, test container startup
 4. **publish**: (optional) Push to Docker Hub
+
+### 5. Container Registry
+
+GitLab CI automatically pushes images to your project's container registry:
+
+```
+registry.gitlab.yourcompany.com/<group>/pipestream-frontend/platform-shell:<tag>
+```
+
+Tags created:
+- `:<commit-sha>` - Every build
+- `:<branch-name>` - Latest for each branch
+- `:latest` - Only on default branch (main)
+
+**Pull the image:**
+```bash
+# Login
+docker login registry.gitlab.yourcompany.com
+
+# Pull
+docker pull registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+```
+
+**Use in docker-compose or Kubernetes:**
+```yaml
+# docker-compose.yml
+services:
+  frontend:
+    image: registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+    ports:
+      - "38106:38106"
+    environment:
+      - PLATFORM_REGISTRATION_HOST=registration
+```
+
+```yaml
+# kubernetes deployment
+spec:
+  containers:
+    - name: frontend
+      image: registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+      imagePullSecrets:
+        - name: gitlab-registry-secret
+```
 
 ## Environment Variables Reference
 
