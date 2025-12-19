@@ -7,6 +7,9 @@
 # Stage 1: Build backend and frontend
 FROM node:22-alpine AS builder
 
+# Install bash and git (required for proto sync scripts and degit)
+RUN apk add --no-cache bash git
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
 
@@ -66,6 +69,7 @@ RUN pnpm install --frozen-lockfile --prod && \
 # Copy built packages
 COPY --from=builder --chown=nodejs:nodejs /app/packages/connector-shared/dist ./packages/connector-shared/dist
 COPY --from=builder --chown=nodejs:nodejs /app/packages/protobuf-forms/dist ./packages/protobuf-forms/dist
+COPY --from=builder --chown=nodejs:nodejs /app/packages/protobuf-forms/src/generated ./packages/protobuf-forms/src/generated
 COPY --from=builder --chown=nodejs:nodejs /app/packages/shared-components/dist ./packages/shared-components/dist
 COPY --from=builder --chown=nodejs:nodejs /app/packages/shared-nav/dist ./packages/shared-nav/dist
 
