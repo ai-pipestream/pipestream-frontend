@@ -2,22 +2,22 @@ import { createClient } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
 import { create } from '@bufbuild/protobuf'
 import {
-  ConnectorAdminService,
-  ConnectorRegistrationSchema,
-  RegisterConnectorRequestSchema,
-  UpdateConnectorRequestSchema,
-  GetConnectorRequestSchema,
-  ListConnectorsRequestSchema,
-  SetConnectorStatusRequestSchema,
-  DeleteConnectorRequestSchema,
+  DataSourceAdminService,
+  DataSourceSchema,
+  CreateDataSourceRequestSchema,
+  UpdateDataSourceRequestSchema,
+  GetDataSourceRequestSchema,
+  ListDataSourcesRequestSchema,
+  SetDataSourceStatusRequestSchema,
+  DeleteDataSourceRequestSchema,
   RotateApiKeyRequestSchema,
-  type ConnectorRegistration,
-  type RegisterConnectorRequest,
-  type UpdateConnectorRequest,
-  type GetConnectorRequest,
-  type ListConnectorsRequest,
-  type SetConnectorStatusRequest,
-  type DeleteConnectorRequest,
+  type DataSource,
+  type CreateDataSourceRequest,
+  type UpdateDataSourceRequest,
+  type GetDataSourceRequest,
+  type ListDataSourcesRequest,
+  type SetDataSourceStatusRequest,
+  type DeleteDataSourceRequest,
   type RotateApiKeyRequest
 } from '@ai-pipestream/protobuf-forms/generated'
 
@@ -29,143 +29,144 @@ const transport = createConnectTransport({
 })
 
 // Create service client
-export const connectorClient = createClient(ConnectorAdminService, transport)
+export const dataSourceClient = createClient(DataSourceAdminService, transport)
 
 // ============================================================================
-// CONNECTOR OPERATIONS
+// DATASOURCE OPERATIONS
 // ============================================================================
 
 /**
- * Register a new connector
+ * Create a new datasource
  */
-export async function registerConnector(
-  connectorName: string,
-  connectorType: string,
+export async function createDataSource(
+  name: string,
   accountId: string,
-  s3Bucket?: string,
-  s3BasePath?: string,
-  maxFileSize?: number,
-  rateLimitPerMinute?: number
-): Promise<{ success: boolean; connectorId: string; apiKey: string; message: string }> {
-  const request = create(RegisterConnectorRequestSchema, {
-    connectorName,
-    connectorType,
+  metadata?: Record<string, string>
+): Promise<{ success: boolean; datasource_id: string; api_key: string; message: string }> {
+  const request = create(CreateDataSourceRequestSchema, {
+    name,
     accountId,
-    s3Bucket: s3Bucket || '',
-    s3BasePath: s3BasePath || '',
-    maxFileSize: BigInt(maxFileSize || 0),
-    rateLimitPerMinute: BigInt(rateLimitPerMinute || 0)
-  }) as RegisterConnectorRequest
+    metadata: metadata || {}
+  }) as CreateDataSourceRequest
 
-  return connectorClient.registerConnector(request)
+  const response = await dataSourceClient.createDataSource(request)
+  return {
+    success: response.success,
+    datasource_id: response.datasourceId,
+    api_key: response.apiKey,
+    message: response.message
+  }
 }
 
 /**
- * Update an existing connector
+ * Update an existing datasource
  */
-export async function updateConnector(
-  connectorId: string,
-  connectorName?: string,
-  s3Bucket?: string,
-  s3BasePath?: string,
-  maxFileSize?: number,
-  rateLimitPerMinute?: number
-): Promise<{ success: boolean; message: string; connector: ConnectorRegistration }> {
-  const request = create(UpdateConnectorRequestSchema, {
-    connectorId,
-    connectorName: connectorName || '',
-    s3Bucket: s3Bucket || '',
-    s3BasePath: s3BasePath || '',
-    maxFileSize: BigInt(maxFileSize || 0),
-    rateLimitPerMinute: BigInt(rateLimitPerMinute || 0)
-  }) as UpdateConnectorRequest
+export async function updateDataSource(
+  datasourceId: string,
+  name?: string,
+  metadata?: Record<string, string>
+): Promise<{ success: boolean; message: string; datasource: DataSource }> {
+  const request = create(UpdateDataSourceRequestSchema, {
+    datasourceId,
+    name: name || '',
+    metadata: metadata || {}
+  }) as UpdateDataSourceRequest
 
-  const response = await connectorClient.updateConnector(request)
+  const response = await dataSourceClient.updateDataSource(request)
   
-  if (!response.connector) {
-    throw new Error('Update response missing connector data')
+  if (!response.datasource) {
+    throw new Error('Update response missing datasource data')
   }
   
   return {
     success: response.success,
     message: response.message,
-    connector: response.connector
+    datasource: response.datasource
   }
 }
 
 /**
- * Get a connector by ID
+ * Get a datasource by ID
  */
-export async function getConnector(connectorId: string): Promise<ConnectorRegistration> {
-  const request = create(GetConnectorRequestSchema, {
-    connectorId
-  }) as GetConnectorRequest
+export async function getDataSource(datasourceId: string): Promise<DataSource> {
+  const request = create(GetDataSourceRequestSchema, {
+    datasourceId
+  }) as GetDataSourceRequest
 
-  return connectorClient.getConnector(request)
+  const response = await dataSourceClient.getDataSource(request)
+  if (!response.datasource) {
+    throw new Error('Get response missing datasource data')
+  }
+  return response.datasource
 }
 
 /**
- * List connectors with optional filtering/pagination
+ * List datasources with optional filtering/pagination
  */
-export async function listConnectors(options: {
+export async function listDataSources(options: {
   accountId?: string
   includeInactive?: boolean
   pageSize?: number
   pageToken?: string
-} = {}): Promise<{ connectors: ConnectorRegistration[]; nextPageToken: string; totalCount: number }> {
-  const request = create(ListConnectorsRequestSchema, {
+} = {}): Promise<{ datasources: DataSource[]; nextPageToken: string; totalCount: number }> {
+  const request = create(ListDataSourcesRequestSchema, {
     accountId: options.accountId || '',
     includeInactive: options.includeInactive ?? false,
     pageSize: options.pageSize ?? 50,
     pageToken: options.pageToken ?? ''
-  }) as ListConnectorsRequest
+  }) as ListDataSourcesRequest
 
-  return connectorClient.listConnectors(request)
+  const response = await dataSourceClient.listDataSources(request)
+  return {
+    datasources: response.datasources,
+    nextPageToken: response.nextPageToken,
+    totalCount: response.totalCount
+  }
 }
 
 /**
- * Set connector status (active/inactive)
+ * Set datasource status (active/inactive)
  */
-export async function setConnectorStatus(
-  connectorId: string,
+export async function setDataSourceStatus(
+  datasourceId: string,
   active: boolean,
   reason?: string
 ): Promise<{ success: boolean; message: string }> {
-  const request = create(SetConnectorStatusRequestSchema, {
-    connectorId,
+  const request = create(SetDataSourceStatusRequestSchema, {
+    datasourceId,
     active,
     reason: reason || ''
-  }) as SetConnectorStatusRequest
+  }) as SetDataSourceStatusRequest
 
-  return connectorClient.setConnectorStatus(request)
+  return dataSourceClient.setDataSourceStatus(request)
 }
 
 /**
- * Delete a connector (soft delete)
+ * Delete a datasource (soft delete)
  */
-export async function deleteConnector(
-  connectorId: string,
+export async function deleteDataSource(
+  datasourceId: string,
   hardDelete: boolean = false
-): Promise<{ success: boolean; message: string; crawlSessionsDeleted: number }> {
-  const request = create(DeleteConnectorRequestSchema, {
-    connectorId,
+): Promise<{ success: boolean; message: string }> {
+  const request = create(DeleteDataSourceRequestSchema, {
+    datasourceId,
     hardDelete
-  }) as DeleteConnectorRequest
+  }) as DeleteDataSourceRequest
 
-  return connectorClient.deleteConnector(request)
+  return dataSourceClient.deleteDataSource(request)
 }
 
 /**
- * Rotate API key for a connector
+ * Rotate API key for a datasource
  */
 export async function rotateApiKey(
-  connectorId: string,
+  datasourceId: string,
   invalidateOldImmediately: boolean = false
 ): Promise<{ success: boolean; newApiKey: string; message: string }> {
   const request = create(RotateApiKeyRequestSchema, {
-    connectorId,
+    datasourceId,
     invalidateOldImmediately
   }) as RotateApiKeyRequest
 
-  return connectorClient.rotateApiKey(request)
+  return dataSourceClient.rotateApiKey(request)
 }

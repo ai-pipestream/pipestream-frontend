@@ -87,11 +87,10 @@ docker run -d \
 
 ## Dependencies
 
-Uses published libraries from npm registry:
-- `@ai-pipestream/grpc-stubs` - Connect-ES service stubs
+Uses workspace packages and published libraries:
+- `@ai-pipestream/protobuf-forms` - Service stubs and form generation (workspace package)
 - `@ai-pipestream/shared-components` - UI components (includes ComponentGallery)
 - `@ai-pipestream/shared-nav` - Navigation shell
-- `@ai-pipestream/protobuf-forms` - Form generation
 - `@ai-pipestream/connector-shared` - Connector utilities
 
 ## Environment Variables

@@ -2,14 +2,14 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6">
-        <v-card v-if="connector">
-          <v-card-title>Edit Connector: {{ connector.connectorName }}</v-card-title>
+        <v-card v-if="datasource">
+          <v-card-title>Edit Data Source: {{ datasource.name }}</v-card-title>
           
           <v-card-text>
-            <v-form v-model="valid" @submit.prevent="updateConnector">
+            <v-form v-model="valid" @submit.prevent="handleUpdateDataSource">
               <v-text-field
-                v-model="form.connectorName"
-                label="Connector Name"
+                v-model="form.name"
+                label="Data Source Name"
                 :rules="nameRules"
                 variant="outlined"
                 required
@@ -17,57 +17,19 @@
               ></v-text-field>
               
               <v-text-field
-                v-model="connector.connectorType"
-                label="Connector Type"
-                variant="outlined"
-                readonly
-                :disabled="loading"
-              ></v-text-field>
-              
-              <v-text-field
-                v-model="connector.accountId"
+                v-model="datasource.accountId"
                 label="Account ID"
                 variant="outlined"
                 readonly
                 :disabled="loading"
               ></v-text-field>
               
-              <v-text-field
-                v-model="form.s3Bucket"
-                label="S3 Bucket"
-                variant="outlined"
-                :disabled="loading"
-              ></v-text-field>
-              
-              <v-text-field
-                v-model="form.s3BasePath"
-                label="S3 Base Path"
-                variant="outlined"
-                :disabled="loading"
-              ></v-text-field>
-              
-              <v-text-field
-                v-model.number="form.maxFileSize"
-                label="Max File Size (bytes)"
-                type="number"
-                variant="outlined"
-                :disabled="loading"
-              ></v-text-field>
-              
-              <v-text-field
-                v-model.number="form.rateLimitPerMinute"
-                label="Rate Limit (per minute)"
-                type="number"
-                variant="outlined"
-                :disabled="loading"
-              ></v-text-field>
-              
               <v-chip
-                :color="connector.active ? 'success' : 'error'"
+                :color="datasource.active ? 'success' : 'error'"
                 size="large"
                 class="ma-2"
               >
-                {{ connector.active ? 'Active' : 'Inactive' }}
+                {{ datasource.active ? 'Active' : 'Inactive' }}
               </v-chip>
             </v-form>
           </v-card-text>
@@ -81,20 +43,20 @@
               Cancel
             </v-btn>
             <v-btn
-              v-if="connector.active"
+              v-if="datasource.active"
               color="warning"
               @click="confirmDeactivate"
               :disabled="loading"
             >
-              Deactivate Connector
+              Deactivate Data Source
             </v-btn>
             <v-btn
               color="primary"
-              @click="updateConnector"
+              @click="handleUpdateDataSource"
               :disabled="!valid || loading"
               :loading="loading"
             >
-              Update Connector
+              Update Data Source
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -102,14 +64,14 @@
         <v-card v-else-if="loading">
           <v-card-text class="text-center">
             <v-progress-circular indeterminate></v-progress-circular>
-            <p class="mt-4">Loading connector...</p>
+            <p class="mt-4">Loading data source...</p>
           </v-card-text>
         </v-card>
         
         <v-card v-else>
           <v-card-text class="text-center">
-            <p>Connector not found</p>
-            <v-btn @click="$router.push('/')">Back to Connectors</v-btn>
+            <p>Data source not found</p>
+            <v-btn @click="$router.push('/')">Back to Data Sources</v-btn>
           </v-card-text>
         </v-card>
       </v-col>
@@ -118,9 +80,9 @@
     <!-- Deactivation Confirmation Dialog -->
     <v-dialog v-model="deactivateDialog" max-width="500">
       <v-card>
-        <v-card-title>Deactivate Connector</v-card-title>
+        <v-card-title>Deactivate Data Source</v-card-title>
         <v-card-text>
-          <p>Are you sure you want to deactivate connector "{{ connector?.connectorName }}"?</p>
+          <p>Are you sure you want to deactivate data source "{{ datasource?.name }}"?</p>
           <v-text-field
             v-model="deactivateReason"
             label="Reason for deactivation"
@@ -133,7 +95,7 @@
           <v-btn @click="deactivateDialog = false">Cancel</v-btn>
           <v-btn
             color="warning"
-            @click="deactivateConnector"
+            @click="deactivateDataSource"
             :disabled="!deactivateReason.trim()"
           >
             Deactivate
@@ -147,18 +109,18 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { getConnector, updateConnector as updateConnectorService, setConnectorStatus as setConnectorStatusService } from '../services/connectorClient'
-import type { ConnectorRegistration } from '@ai-pipestream/protobuf-forms/generated'
+import { getDataSource, updateDataSource as updateDataSourceService, setDataSourceStatus as setDataSourceStatusService } from '../services/connectorClient'
+import type { DataSource } from '@ai-pipestream/protobuf-forms/generated'
 
 const router = useRouter()
 
 // Props
 const props = defineProps<{
-  connectorId: string
+  datasourceId: string
 }>()
 
 // Reactive data
-const connector = ref<ConnectorRegistration | null>(null)
+const datasource = ref<DataSource | null>(null)
 const loading = ref(false)
 const valid = ref(false)
 const deactivateDialog = ref(false)
@@ -166,74 +128,58 @@ const deactivateReason = ref('')
 
 // Form data
 const form = reactive({
-  connectorName: '',
-  s3Bucket: '',
-  s3BasePath: '',
-  maxFileSize: 0,
-  rateLimitPerMinute: 0
+  name: ''
 })
 
 // Form validation rules
 const nameRules = [
-  (v: string) => !!v || 'Connector name is required',
-  (v: string) => (v && v.length >= 2) || 'Connector name must be at least 2 characters',
-  (v: string) => /^[a-zA-Z0-9-_]+$/.test(v) || 'Connector name can only contain letters, numbers, hyphens, and underscores'
+  (v: string) => !!v || 'Data source name is required',
+  (v: string) => (v && v.length >= 2) || 'Data source name must be at least 2 characters',
+  (v: string) => /^[a-zA-Z0-9-_]+$/.test(v) || 'Data source name can only contain letters, numbers, hyphens, and underscores'
 ]
 
 // Methods
-const loadConnector = async () => {
+const loadDataSource = async () => {
   loading.value = true
   try {
-    if (!props.connectorId) {
-      connector.value = null
+    if (!props.datasourceId) {
+      datasource.value = null
       return
     }
 
-    connector.value = await getConnector(props.connectorId)
-    if (connector.value) {
-      form.connectorName = connector.value.connectorName
-      form.s3Bucket = connector.value.s3Bucket || ''
-      form.s3BasePath = connector.value.s3BasePath || ''
-      form.maxFileSize = Number(connector.value.maxFileSize || 0n)
-      form.rateLimitPerMinute = Number(connector.value.rateLimitPerMinute || 0n)
+    datasource.value = await getDataSource(props.datasourceId)
+    if (datasource.value) {
+      form.name = datasource.value.name
     }
     valid.value = true
   } catch (error) {
-    console.error('Failed to load connector:', error)
-    connector.value = null
+    console.error('Failed to load data source:', error)
+    datasource.value = null
   } finally {
     loading.value = false
   }
 }
 
-const updateConnector = async () => {
-  if (!valid.value || !connector.value) return
+const handleUpdateDataSource = async () => {
+  if (!valid.value || !datasource.value) return
   
   loading.value = true
   try {
-    const result = await updateConnectorService(
-      connector.value.connectorId,
-      form.connectorName.trim(),
-      form.s3Bucket || undefined,
-      form.s3BasePath || undefined,
-      form.maxFileSize || undefined,
-      form.rateLimitPerMinute || undefined
+    const result = await updateDataSourceService(
+      datasource.value.datasourceId,
+      form.name.trim()
     )
 
     if (result.success) {
-      connector.value = result.connector
-      form.connectorName = result.connector.connectorName
-      form.s3Bucket = result.connector.s3Bucket || ''
-      form.s3BasePath = result.connector.s3BasePath || ''
-      form.maxFileSize = Number(result.connector.maxFileSize || 0n)
-      form.rateLimitPerMinute = Number(result.connector.rateLimitPerMinute || 0n)
+      datasource.value = result.datasource
+      form.name = result.datasource.name
       valid.value = true
-      console.info('Connector updated successfully')
+      console.info('Data source updated successfully')
     } else {
-      console.error('Failed to update connector:', result.message)
+      console.error('Failed to update data source:', result.message)
     }
   } catch (error) {
-    console.error('Failed to update connector:', error)
+    console.error('Failed to update data source:', error)
   } finally {
     loading.value = false
   }
@@ -244,34 +190,34 @@ const confirmDeactivate = () => {
   deactivateDialog.value = true
 }
 
-const deactivateConnector = async () => {
-  if (!connector.value || !deactivateReason.value.trim()) return
+const deactivateDataSource = async () => {
+  if (!datasource.value || !deactivateReason.value.trim()) return
   
   try {
-    const result = await setConnectorStatusService(
-      connector.value.connectorId,
+    const result = await setDataSourceStatusService(
+      datasource.value.datasourceId,
       false,
       deactivateReason.value
     )
     
     if (result.success) {
-      // Update the connector status
-      connector.value = { ...connector.value, active: false }
+      // Update the datasource status
+      datasource.value = { ...datasource.value, active: false }
       deactivateDialog.value = false
       deactivateReason.value = ''
     } else {
-      console.error('Failed to deactivate connector:', result.message)
+      console.error('Failed to deactivate data source:', result.message)
     }
   } catch (error) {
-    console.error('Error deactivating connector:', error)
+    console.error('Error deactivating data source:', error)
   }
 }
 
 // Lifecycle
 watch(
-  () => props.connectorId,
+  () => props.datasourceId,
   () => {
-    loadConnector()
+    loadDataSource()
   },
   { immediate: true }
 )

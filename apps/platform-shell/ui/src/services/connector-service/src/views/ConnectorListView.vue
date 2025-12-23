@@ -4,7 +4,7 @@
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex flex-wrap align-center">
-            <span class="text-h6">Connectors</span>
+            <span class="text-h6">Data Sources</span>
             <v-spacer></v-spacer>
             <v-switch
               v-model="includeInactive"
@@ -16,7 +16,7 @@
             ></v-switch>
             <v-text-field
               v-model="search"
-              label="Search connectors..."
+              label="Search data sources..."
               prepend-inner-icon="mdi-magnify"
               variant="outlined"
               hide-details
@@ -24,7 +24,7 @@
               class="mr-2"
               :disabled="loading"
               clearable
-              @keyup.enter="reloadConnectors"
+              @keyup.enter="reloadDataSources"
               @click:clear="onSearchCleared"
             ></v-text-field>
             <v-btn
@@ -32,14 +32,14 @@
               prepend-icon="mdi-plus"
               @click="$router.push('/admin-connector/create')"
             >
-              Create Connector
+              Create Data Source
             </v-btn>
           </v-card-title>
           
           <v-card-text>
             <v-data-table
               :headers="headers"
-              :items="connectors"
+              :items="datasources"
               :loading="loading"
               :items-length="totalCount"
               class="elevation-1"
@@ -54,24 +54,24 @@
                 </v-chip>
               </template>
               
-              <template v-slot:item.created="{ item }">
-                {{ formatDate(item.created) }}
+              <template v-slot:item.createdAt="{ item }">
+                {{ formatDate(item.createdAt) }}
               </template>
               
-              <template v-slot:item.updated="{ item }">
-                {{ formatDate(item.updated) }}
+              <template v-slot:item.updatedAt="{ item }">
+                {{ formatDate(item.updatedAt) }}
               </template>
               
               <template v-slot:item.actions="{ item }">
                 <v-btn
                   icon="mdi-eye"
                   size="small"
-                  @click="viewConnector(item)"
+                  @click="viewDataSource(item)"
                 ></v-btn>
                 <v-btn
                   icon="mdi-pencil"
                   size="small"
-                  @click="editConnector(item)"
+                  @click="editDataSource(item)"
                 ></v-btn>
                 <v-btn
                   v-if="item.active"
@@ -116,9 +116,9 @@
     <!-- Deactivation Confirmation Dialog -->
     <v-dialog v-model="deactivateDialog" max-width="500">
       <v-card>
-        <v-card-title>Deactivate Connector</v-card-title>
+        <v-card-title>Deactivate Data Source</v-card-title>
         <v-card-text>
-          <p>Are you sure you want to deactivate connector "{{ selectedConnector?.connectorName }}"?</p>
+          <p>Are you sure you want to deactivate data source "{{ selectedDataSource?.name }}"?</p>
           <v-text-field
             v-model="deactivateReason"
             label="Reason for deactivation"
@@ -131,7 +131,7 @@
           <v-btn @click="deactivateDialog = false">Cancel</v-btn>
           <v-btn
             color="warning"
-            @click="deactivateConnector"
+            @click="deactivateDataSource"
             :disabled="!deactivateReason.trim()"
           >
             Deactivate
@@ -143,9 +143,9 @@
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="deleteDialog" max-width="500">
       <v-card>
-        <v-card-title>Delete Connector</v-card-title>
+        <v-card-title>Delete Data Source</v-card-title>
         <v-card-text>
-          <p>Are you sure you want to delete connector "{{ selectedConnector?.connectorName }}"?</p>
+          <p>Are you sure you want to delete data source "{{ selectedDataSource?.name }}"?</p>
           <p class="text-caption text-warning">This action cannot be undone.</p>
         </v-card-text>
         <v-card-actions>
@@ -153,7 +153,7 @@
           <v-btn @click="deleteDialog = false">Cancel</v-btn>
           <v-btn
             color="error"
-            @click="deleteConnector"
+            @click="deleteDataSource"
           >
             Delete
           </v-btn>
@@ -166,7 +166,7 @@
       <v-card>
         <v-card-title>Rotate API Key</v-card-title>
         <v-card-text>
-          <p>Are you sure you want to rotate the API key for connector "{{ selectedConnector?.connectorName }}"?</p>
+          <p>Are you sure you want to rotate the API key for data source "{{ selectedDataSource?.name }}"?</p>
           <p class="text-caption text-warning">The old API key will stop working immediately.</p>
           <v-text-field
             v-model="newApiKey"
@@ -190,25 +190,25 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
-  getConnector, 
-  setConnectorStatus as setConnectorStatusService, 
-  deleteConnector as deleteConnectorService,
+  getDataSource, 
+  setDataSourceStatus as setDataSourceStatusService, 
+  deleteDataSource as deleteDataSourceService,
   rotateApiKey as rotateApiKeyService,
-  listConnectors as listConnectorsService 
+  listDataSources as listDataSourcesService 
 } from '../services/connectorClient'
-import type { ConnectorRegistration } from '@ai-pipestream/protobuf-forms/generated'
+import type { DataSource } from '@ai-pipestream/protobuf-forms/generated'
 
 const router = useRouter()
 
 // Reactive data
-const connectors = ref<ConnectorRegistration[]>([])
+const datasources = ref<DataSource[]>([])
 const loading = ref(false)
 const search = ref('')
 const includeInactive = ref(false)
 const deactivateDialog = ref(false)
 const deleteDialog = ref(false)
 const rotateDialog = ref(false)
-const selectedConnector = ref<ConnectorRegistration | null>(null)
+const selectedDataSource = ref<DataSource | null>(null)
 const deactivateReason = ref('')
 const newApiKey = ref('')
 const nextPageToken = ref('')
@@ -216,38 +216,37 @@ const totalCount = ref(0)
 
 // Table headers
 const headers = [
-  { title: 'Connector ID', key: 'connectorId', sortable: true },
-  { title: 'Name', key: 'connectorName', sortable: true },
-  { title: 'Type', key: 'connectorType', sortable: true },
+  { title: 'Data Source ID', key: 'datasourceId', sortable: true },
+  { title: 'Name', key: 'name', sortable: true },
   { title: 'Account ID', key: 'accountId', sortable: true },
   { title: 'Status', key: 'active', sortable: true },
-  { title: 'Created', key: 'created', sortable: true },
-  { title: 'Updated', key: 'updated', sortable: true },
+  { title: 'Created', key: 'createdAt', sortable: true },
+  { title: 'Updated', key: 'updatedAt', sortable: true },
   { title: 'Actions', key: 'actions', sortable: false },
 ]
 
 // Methods
-const loadConnectors = async (options: { append?: boolean; pageToken?: string } = {}) => {
+const loadDataSources = async (options: { append?: boolean; pageToken?: string } = {}) => {
   loading.value = true
   try {
-    const response = await listConnectorsService({
+    const response = await listDataSourcesService({
       accountId: search.value.trim() || undefined,
       includeInactive: includeInactive.value,
       pageToken: options.pageToken
     })
 
     if (options.append) {
-      connectors.value = [...connectors.value, ...(response.connectors ?? [])]
+      datasources.value = [...datasources.value, ...(response.datasources ?? [])]
     } else {
-      connectors.value = response.connectors ?? []
+      datasources.value = response.datasources ?? []
     }
 
     nextPageToken.value = response.nextPageToken || ''
-    totalCount.value = response.totalCount || connectors.value.length
+    totalCount.value = response.totalCount || datasources.value.length
   } catch (error) {
-    console.error('Failed to load connectors:', error)
+    console.error('Failed to load data sources:', error)
     if (!options.append) {
-      connectors.value = []
+      datasources.value = []
       nextPageToken.value = ''
       totalCount.value = 0
     }
@@ -256,98 +255,98 @@ const loadConnectors = async (options: { append?: boolean; pageToken?: string } 
   }
 }
 
-const reloadConnectors = () => {
+const reloadDataSources = () => {
   nextPageToken.value = ''
-  loadConnectors()
+  loadDataSources()
 }
 
 const onSearchCleared = () => {
   if (!search.value) {
-    reloadConnectors()
+    reloadDataSources()
   }
 }
 
 const loadMore = () => {
   if (!nextPageToken.value) return
-  loadConnectors({ append: true, pageToken: nextPageToken.value })
+  loadDataSources({ append: true, pageToken: nextPageToken.value })
 }
 
-const viewConnector = (connector: ConnectorRegistration) => {
-  // Navigate to connector details view
-  console.log('View connector:', connector)
+const viewDataSource = (datasource: DataSource) => {
+  // Navigate to datasource details view
+  console.log('View data source:', datasource)
 }
 
-const editConnector = (connector: ConnectorRegistration) => {
-  router.push({ name: 'connectors-edit', params: { connectorId: connector.connectorId } })
+const editDataSource = (datasource: DataSource) => {
+  router.push({ name: 'connectors-edit', params: { datasourceId: datasource.datasourceId } })
 }
 
-const confirmDeactivate = (connector: ConnectorRegistration) => {
-  selectedConnector.value = connector
+const confirmDeactivate = (datasource: DataSource) => {
+  selectedDataSource.value = datasource
   deactivateReason.value = ''
   deactivateDialog.value = true
 }
 
-const deactivateConnector = async () => {
-  if (!selectedConnector.value || !deactivateReason.value.trim()) return
+const deactivateDataSource = async () => {
+  if (!selectedDataSource.value || !deactivateReason.value.trim()) return
   
   try {
-    const result = await setConnectorStatusService(
-      selectedConnector.value.connectorId,
+    const result = await setDataSourceStatusService(
+      selectedDataSource.value.datasourceId,
       false,
       deactivateReason.value
     )
     
     if (result.success) {
-      // Update the connector in the list
-      const index = connectors.value.findIndex(c => c.connectorId === selectedConnector.value!.connectorId)
+      // Update the datasource in the list
+      const index = datasources.value.findIndex(d => d.datasourceId === selectedDataSource.value!.datasourceId)
       if (index !== -1) {
-        connectors.value[index] = { ...connectors.value[index], active: false }
+        datasources.value[index] = { ...datasources.value[index], active: false }
       }
       
       deactivateDialog.value = false
-      selectedConnector.value = null
+      selectedDataSource.value = null
       deactivateReason.value = ''
     } else {
-      console.error('Failed to deactivate connector:', result.message)
+      console.error('Failed to deactivate data source:', result.message)
     }
   } catch (error) {
-    console.error('Error deactivating connector:', error)
+    console.error('Error deactivating data source:', error)
   }
 }
 
-const confirmDelete = (connector: ConnectorRegistration) => {
-  selectedConnector.value = connector
+const confirmDelete = (datasource: DataSource) => {
+  selectedDataSource.value = datasource
   deleteDialog.value = true
 }
 
-const deleteConnector = async () => {
-  if (!selectedConnector.value) return
+const deleteDataSource = async () => {
+  if (!selectedDataSource.value) return
   
   try {
-    const result = await deleteConnectorService(selectedConnector.value.connectorId, false)
+    const result = await deleteDataSourceService(selectedDataSource.value.datasourceId, false)
     
     if (result.success) {
-      // Remove the connector from the list
-      connectors.value = connectors.value.filter(c => c.connectorId !== selectedConnector.value!.connectorId)
+      // Remove the datasource from the list
+      datasources.value = datasources.value.filter(d => d.datasourceId !== selectedDataSource.value!.datasourceId)
       totalCount.value = Math.max(0, totalCount.value - 1)
       
       deleteDialog.value = false
-      selectedConnector.value = null
+      selectedDataSource.value = null
     } else {
-      console.error('Failed to delete connector:', result.message)
+      console.error('Failed to delete data source:', result.message)
     }
   } catch (error) {
-    console.error('Error deleting connector:', error)
+    console.error('Error deleting data source:', error)
   }
 }
 
-const rotateApiKey = async (connector: ConnectorRegistration) => {
+const rotateApiKey = async (datasource: DataSource) => {
   try {
-    const result = await rotateApiKeyService(connector.connectorId, true)
+    const result = await rotateApiKeyService(datasource.datasourceId, true)
     
     if (result.success) {
       newApiKey.value = result.newApiKey
-      selectedConnector.value = connector
+      selectedDataSource.value = datasource
       rotateDialog.value = true
     } else {
       console.error('Failed to rotate API key:', result.message)
@@ -376,10 +375,10 @@ const formatDate = (timestamp: any) => {
 
 // Lifecycle
 onMounted(() => {
-  loadConnectors()
+  loadDataSources()
 })
 
 watch(includeInactive, () => {
-  reloadConnectors()
+  reloadDataSources()
 })
 </script>

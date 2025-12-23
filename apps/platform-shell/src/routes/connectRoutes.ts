@@ -10,7 +10,7 @@ import {
   NodeUploadService,
   PipeDocService,
   AccountService,
-  ConnectorAdminService
+  DataSourceAdminService
 } from "@ai-pipestream/protobuf-forms/generated";
 import { createDynamicTransport, resolveService } from "../lib/serviceResolver.js";
 
@@ -380,54 +380,54 @@ export default (router: ConnectRouter) => {
     }
   });
 
-  // Connector Admin Service proxy
-  router.service(ConnectorAdminService, {
-    registerConnector(req: any, context: any) {
-      console.log("[Connect] Proxying registerConnector to connector-service");
+  // DataSource Admin Service proxy
+  router.service(DataSourceAdminService, {
+    createDataSource(req: any, context: any) {
+      console.log("[Connect] Proxying createDataSource to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
-      return client.registerConnector(req);
+      const client = createClient(DataSourceAdminService, transport);
+      return client.createDataSource(req);
     },
-    updateConnector(req: any, context: any) {
-      console.log("[Connect] Proxying updateConnector to connector-service");
+    updateDataSource(req: any, context: any) {
+      console.log("[Connect] Proxying updateDataSource to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
-      return client.updateConnector(req);
+      const client = createClient(DataSourceAdminService, transport);
+      return client.updateDataSource(req);
     },
-    getConnector(req: any, context: any) {
-      console.log("[Connect] Proxying getConnector to connector-service");
+    getDataSource(req: any, context: any) {
+      console.log("[Connect] Proxying getDataSource to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
-      return client.getConnector(req);
+      const client = createClient(DataSourceAdminService, transport);
+      return client.getDataSource(req);
     },
-    listConnectors(req: any, context: any) {
-      console.log("[Connect] Proxying listConnectors to connector-service");
+    listDataSources(req: any, context: any) {
+      console.log("[Connect] Proxying listDataSources to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
-      return client.listConnectors(req);
+      const client = createClient(DataSourceAdminService, transport);
+      return client.listDataSources(req);
     },
-    setConnectorStatus(req: any, context: any) {
-      console.log("[Connect] Proxying setConnectorStatus to connector-service");
+    setDataSourceStatus(req: any, context: any) {
+      console.log("[Connect] Proxying setDataSourceStatus to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
-      return client.setConnectorStatus(req);
+      const client = createClient(DataSourceAdminService, transport);
+      return client.setDataSourceStatus(req);
     },
-    deleteConnector(req: any, context: any) {
-      console.log("[Connect] Proxying deleteConnector to connector-service");
+    deleteDataSource(req: any, context: any) {
+      console.log("[Connect] Proxying deleteDataSource to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
-      return client.deleteConnector(req);
+      const client = createClient(DataSourceAdminService, transport);
+      return client.deleteDataSource(req);
     },
     rotateApiKey(req: any, context: any) {
       console.log("[Connect] Proxying rotateApiKey to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
+      const client = createClient(DataSourceAdminService, transport);
       return client.rotateApiKey(req);
     },
     getCrawlHistory(req: any, context: any) {
       console.log("[Connect] Proxying getCrawlHistory to connector-service");
       const transport = createDynamicTransport("connector-service");
-      const client = createClient(ConnectorAdminService, transport);
+      const client = createClient(DataSourceAdminService, transport);
       return client.getCrawlHistory(req);
     }
   });
