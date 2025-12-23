@@ -1,8 +1,8 @@
 # Multi-stage build for platform-shell (monorepo)
 # This creates a single container with both the backend proxy and frontend UI
 #
-# Build from monorepo root: docker build -f apps/platform-shell/Dockerfile -t ai-pipestream/platform-shell .
-# Run: docker run -p 38106:38106 ai-pipestream/platform-shell
+# Build from monorepo root: docker build -f apps/platform-shell/Dockerfile -t ai-pipestream/pipestream-frontend .
+# Run: docker run -p 38106:38106 ai-pipestream/pipestream-frontend
 
 # Stage 1: Build backend and frontend
 FROM node:22-alpine AS builder
@@ -11,7 +11,7 @@ FROM node:22-alpine AS builder
 RUN apk add --no-cache bash git
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
 
 # Set working directory to monorepo root
 WORKDIR /app
@@ -45,7 +45,7 @@ RUN pnpm -r build
 FROM node:22-alpine AS runtime
 
 # Install pnpm for production
-RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
 
 # Create app user for security
 RUN addgroup -g 1001 -S nodejs && \
