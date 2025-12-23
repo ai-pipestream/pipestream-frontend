@@ -55,13 +55,13 @@
     "vuetify": "catalog:"
   },
   "devDependencies": {
-    "vuetify": "catalog:",
-    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitejs/plugin-vue": "^6.0.3",
     "@vue/tsconfig": "^0.7.0",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
     "vite-plugin-dts": "^4.5.4",
-    "vue-tsc": "^3.0.5"
+    "vue-tsc": "^3.2.1",
+    "vuetify": "catalog:"
   },
   "engines": {
     "node": ">=22.0.0 <23",

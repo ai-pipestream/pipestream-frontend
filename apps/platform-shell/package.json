@@ -38,24 +38,24 @@
   },
   "homepage": "https://github.com/ai-pipestream/platform-frontend#readme",
   "dependencies": {
+    "@ai-pipestream/connector-shared": "workspace:*",
+    "@ai-pipestream/protobuf-forms": "workspace:*",
     "@bufbuild/protobuf": "catalog:",
     "@connectrpc/connect": "catalog:",
-    "@connectrpc/connect-express": "^2.1.0",
-    "@connectrpc/connect-node": "^2.1.0",
-    "@ai-pipestream/protobuf-forms": "workspace:*",
-    "@ai-pipestream/connector-shared": "workspace:*",
+    "@connectrpc/connect-express": "^2.1.1",
+    "@connectrpc/connect-node": "^2.1.1",
     "@types/multer": "^2.0.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "multer": "^2.0.2",
-    "tsx": "^4.20.5"
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@types/node": "^24.2.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.4",
     "concurrently": "^8.2.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22.0.0 <23",

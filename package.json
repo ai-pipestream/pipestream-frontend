@@ -23,14 +23,14 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.10.2",
     "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-web": "^2.1.1",
-    "@connectrpc/connect-node": "^2.1.1",
     "@connectrpc/connect-express": "^2.1.1",
-    "vue": "^3.5.18",
-    "vuetify": "^3.9.3",
-    "@jsonforms/core": "^3.7.0-alpha.2",
-    "@jsonforms/vue": "^3.7.0-alpha.2",
-    "@jsonforms/vue-vuetify": "^3.7.0-alpha.2",
-    "@jsonforms/vue-vanilla": "^3.7.0-alpha.2"
+    "@connectrpc/connect-node": "^2.1.1",
+    "@connectrpc/connect-web": "^2.1.1",
+    "@jsonforms/core": "^3.7.0",
+    "@jsonforms/vue": "^3.7.0",
+    "@jsonforms/vue-vanilla": "^3.7.0",
+    "@jsonforms/vue-vuetify": "^3.7.0",
+    "vue": "^3.5.26",
+    "vuetify": "^3.11.4"
   }
 }
