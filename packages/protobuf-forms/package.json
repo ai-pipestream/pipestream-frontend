@@ -68,11 +68,11 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.61.0",
     "@bufbuild/protoc-gen-es": "^2.10.2",
-    "@types/node": "^22.19.3",
+    "@types/node": "^25.0.0",
     "degit": "^2.8.4",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^2.1.9"
+    "vitest": "^4.0.0"
   },
   "peerDependencies": {
     "@jsonforms/core": "catalog:",
