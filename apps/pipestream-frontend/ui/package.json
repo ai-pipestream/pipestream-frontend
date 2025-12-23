@@ -1,5 +1,5 @@
 {
-  "name": "@ai-pipestream/platform-shell-ui",
+  "name": "@ai-pipestream/pipestream-frontend-ui",
   "private": true,
   "version": "1.0.0",
   "description": "Unified frontend for Pipeline platform services",

@@ -196,21 +196,21 @@ const client = createClient(MyService, transport)
 
 **File Locations:**
 - Components: `packages/shared-components/src/components/`
-- Services: `apps/platform-shell/ui/src/services/{service-name}/`
-- Stores: `apps/platform-shell/ui/src/stores/`
-- Composables: `apps/platform-shell/ui/src/composables/`
-- Routes: `apps/platform-shell/ui/src/router/`
+- Services: `apps/pipestream-frontend/ui/src/services/{service-name}/`
+- Stores: `apps/pipestream-frontend/ui/src/stores/`
+- Composables: `apps/pipestream-frontend/ui/src/composables/`
+- Routes: `apps/pipestream-frontend/ui/src/router/`
 
 **Key Files:**
-- Service registry: `apps/platform-shell/ui/src/stores/serviceRegistry.ts`
-- Health monitoring: `apps/platform-shell/ui/src/composables/useShellHealth.ts`
-- Vite config: `apps/platform-shell/ui/vite.config.ts`
+- Service registry: `apps/pipestream-frontend/ui/src/stores/serviceRegistry.ts`
+- Health monitoring: `apps/pipestream-frontend/ui/src/composables/useShellHealth.ts`
+- Vite config: `apps/pipestream-frontend/ui/vite.config.ts`
 - Version catalog: `pnpm-workspace.yaml`
 
 **Scripts:**
 - `pnpm install` - Install dependencies
 - `pnpm -r build` - Build all packages
-- `./scripts/start-platform-shell.sh` - Run frontend + backend locally
+- `./scripts/start-pipestream-frontend.sh` - Run frontend + backend locally
 - `./scripts/nuclear-clean.sh` - Clear all caches
 - `./scripts/sync-grpc-stubs-version.sh <version>` - Update grpc-stubs version
 

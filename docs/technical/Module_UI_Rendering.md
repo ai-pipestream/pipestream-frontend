@@ -354,7 +354,7 @@ The `UniversalConfigCard` component filters the raw schema to:
 ### Backend
 - **platform-registration-service** - Lists modules, **provides schemas from Apicurio**
 - **Apicurio Registry** - Stores and versions all module schemas
-- **platform-shell proxy** - Routes gRPC calls
+- **pipestream-frontend proxy** - Routes gRPC calls
 
 ### Libraries
 - `@jsonforms/vue` - Vue 3 integration
@@ -374,6 +374,6 @@ The `UniversalConfigCard` component filters the raw schema to:
 - [Apicurio Registry Documentation](https://www.apicur.io/registry/docs/apicurio-registry/3.1.x/getting-started/assembly-intro-to-the-registry.html)
 
 **Example Modules:**
-- Chunker: `apps/platform-shell/ui/src/pipeline-modules/chunker`
-- Parser: `apps/platform-shell/ui/src/pipeline-modules/parser`
-- Echo: `apps/platform-shell/ui/src/pipeline-modules/echo`
+- Chunker: `apps/pipestream-frontend/ui/src/pipeline-modules/chunker`
+- Parser: `apps/pipestream-frontend/ui/src/pipeline-modules/parser`
+- Echo: `apps/pipestream-frontend/ui/src/pipeline-modules/echo`

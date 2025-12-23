@@ -84,7 +84,7 @@ pnpm run dev:all
 
 ```bash
 # From the monorepo root
-docker build -f apps/platform-shell/Dockerfile -t platform-shell:local .
+docker build -f apps/pipestream-frontend/Dockerfile -t pipestream-frontend:local .
 ```
 
 ### Push to GitLab Container Registry
@@ -96,11 +96,11 @@ docker login registry.gitlab.yourcompany.com
 
 # Tag for GitLab registry
 # Format: registry.gitlab.yourcompany.com/<group>/<project>/<image>:<tag>
-docker tag platform-shell:local \
-  registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+docker tag pipestream-frontend:local \
+  registry.gitlab.yourcompany.com/your-group/pipestream-frontend/pipestream-frontend:latest
 
 # Push
-docker push registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+docker push registry.gitlab.yourcompany.com/your-group/pipestream-frontend/pipestream-frontend:latest
 ```
 
 #### Multi-arch Build and Push
@@ -115,8 +115,8 @@ docker buildx create --name multiarch --use
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --push \
-  -t registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest \
-  -f apps/platform-shell/Dockerfile \
+  -t registry.gitlab.yourcompany.com/your-group/pipestream-frontend/pipestream-frontend:latest \
+  -f apps/pipestream-frontend/Dockerfile \
   .
 ```
 
@@ -124,13 +124,13 @@ docker buildx build \
 
 ```bash
 # Basic run
-docker run -p 38106:38106 platform-shell:local
+docker run -p 38106:38106 pipestream-frontend:local
 
 # With environment overrides
 docker run -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=host.docker.internal \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  platform-shell:local
+  pipestream-frontend:local
 ```
 
 ### Run with Backend Services
@@ -151,7 +151,7 @@ docker run -d --name frontend --network pipestream \
   -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=registration \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  platform-shell:local
+  pipestream-frontend:local
 ```
 
 ## GitLab CI/CD Setup
@@ -201,7 +201,7 @@ The GitLab CI pipeline runs these stages:
 GitLab CI automatically pushes images to your project's container registry:
 
 ```
-registry.gitlab.yourcompany.com/<group>/pipestream-frontend/platform-shell:<tag>
+registry.gitlab.yourcompany.com/<group>/pipestream-frontend/pipestream-frontend:<tag>
 ```
 
 Tags created:
@@ -215,7 +215,7 @@ Tags created:
 docker login registry.gitlab.yourcompany.com
 
 # Pull
-docker pull registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+docker pull registry.gitlab.yourcompany.com/your-group/pipestream-frontend/pipestream-frontend:latest
 ```
 
 **Use in docker-compose or Kubernetes:**
@@ -223,7 +223,7 @@ docker pull registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platf
 # docker-compose.yml
 services:
   frontend:
-    image: registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+    image: registry.gitlab.yourcompany.com/your-group/pipestream-frontend/pipestream-frontend:latest
     ports:
       - "38106:38106"
     environment:
@@ -235,7 +235,7 @@ services:
 spec:
   containers:
     - name: frontend
-      image: registry.gitlab.yourcompany.com/your-group/pipestream-frontend/platform-shell:latest
+      image: registry.gitlab.yourcompany.com/your-group/pipestream-frontend/pipestream-frontend:latest
       imagePullSecrets:
         - name: gitlab-registry-secret
 ```
@@ -269,7 +269,7 @@ pipestream-frontend/
 ├── .github/workflows/           # GitHub Actions (public CI)
 ├── .gitlab-ci.yml.template      # GitLab CI template
 ├── apps/
-│   └── platform-shell/
+│   └── pipestream-frontend/
 │       ├── Dockerfile           # Full build (syncs protos in Docker)
 │       ├── Dockerfile.gitlab    # Uses pre-built CI artifacts
 │       └── src/

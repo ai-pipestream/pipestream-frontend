@@ -19,7 +19,7 @@ This monorepo provides:
 ```
 platform-frontend/
 ├── apps/
-│   └── platform-shell/          # Main platform application
+│   └── pipestream-frontend/          # Main platform application
 │       ├── src/                 # Backend (Express + Connect-ES proxy)
 │       └── ui/                  # Frontend (Vue 3 + Vuetify)
 └── packages/
@@ -65,7 +65,7 @@ pnpm install
 pnpm build
 
 # Run Platform Shell in development mode
-./scripts/start-platform-shell.sh
+./scripts/start-pipestream-frontend.sh
 ```
 
 Access the platform at:
@@ -79,7 +79,7 @@ Access the platform at:
 pnpm build
 
 # Run in production mode
-cd apps/platform-shell
+cd apps/pipestream-frontend
 NODE_ENV=production pnpm start
 ```
 
@@ -95,15 +95,15 @@ The Dockerfile uses a multi-stage build process:
 
 ```bash
 # Build the image (must run from monorepo root)
-docker build -f apps/platform-shell/Dockerfile -t platform-shell .
+docker build -f apps/pipestream-frontend/Dockerfile -t pipestream-frontend .
 
 # Run the container
 docker run -d \
-  --name platform-shell \
+  --name pipestream-frontend \
   -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=platform-registration-service \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  platform-shell
+  pipestream-frontend
 ```
 
 Access at: http://localhost:38106
@@ -113,7 +113,7 @@ Access at: http://localhost:38106
 Images are automatically published to GitHub Container Registry on every push to `main`:
 
 ```bash
-docker pull ghcr.io/ai-pipestream/platform-shell:latest
+docker pull ghcr.io/ai-pipestream/pipestream-frontend:latest
 ```
 
 ## Development Scripts
@@ -128,7 +128,7 @@ Convenient scripts for local development:
 ./scripts/start-frontend.sh
 
 # Start both together with hot-reload
-./scripts/start-platform-shell.sh
+./scripts/start-pipestream-frontend.sh
 ```
 
 ## Platform Shell Features
@@ -231,7 +231,7 @@ These variables configure the Express backend server:
 
 ### Development Mode Configuration
 
-For local development, create a `.env` file in `apps/platform-shell/ui/`:
+For local development, create a `.env` file in `apps/pipestream-frontend/ui/`:
 
 ```bash
 # Development - Vite proxies to local backend
@@ -244,7 +244,7 @@ VITE_GRPC_DEBUG=true
 Then start the platform:
 
 ```bash
-./scripts/start-platform-shell.sh
+./scripts/start-pipestream-frontend.sh
 ```
 
 **Architecture in Development:**
@@ -292,27 +292,27 @@ When deploying via Docker, set environment variables in your deployment:
 
 ```bash
 docker run -d \
-  --name platform-shell \
+  --name pipestream-frontend \
   -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=platform-registration-service \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  platform-shell
+  pipestream-frontend
 ```
 
 For Consul integration:
 
 ```bash
 docker run -d \
-  --name platform-shell \
+  --name pipestream-frontend \
   -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=consul-sidecar \
   -e PLATFORM_REGISTRATION_PORT=8500 \
-  platform-shell
+  pipestream-frontend
 ```
 
 ### Configuration File
 
-See `apps/platform-shell/ui/.env.example` for a complete example with all available options and documentation.
+See `apps/pipestream-frontend/ui/.env.example` for a complete example with all available options and documentation.
 
 ## API Endpoints
 
@@ -353,7 +353,7 @@ curl http://localhost:38106/api/system-status
 
 ### Apps
 
-- **platform-shell**: Main unified frontend application
+- **pipestream-frontend**: Main unified frontend application
   - Backend: Express server with Connect-ES proxy
   - Frontend: Vue 3 + Vuetify SPA
   - Routing: Dynamic service/module discovery
@@ -478,15 +478,15 @@ pnpm build
 
 ```bash
 # View container logs
-docker logs platform-shell
+docker logs pipestream-frontend
 
 # Shell into container
-docker exec -it platform-shell /bin/sh
+docker exec -it pipestream-frontend /bin/sh
 
 # Clean restart
-docker rm -f platform-shell
-docker build -f apps/platform-shell/Dockerfile -t platform-shell .
-docker run -d --name platform-shell -p 38106:38106 platform-shell
+docker rm -f pipestream-frontend
+docker build -f apps/pipestream-frontend/Dockerfile -t pipestream-frontend .
+docker run -d --name pipestream-frontend -p 38106:38106 pipestream-frontend
 ```
 
 ## License
@@ -497,7 +497,7 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 - **GitHub Repository**: https://github.com/ai-pipestream/platform-frontend
 - **Issue Tracker**: https://github.com/ai-pipestream/platform-frontend/issues
-- **Documentation**: [Platform Shell README](apps/platform-shell/README.md)
+- **Documentation**: [Platform Shell README](apps/pipestream-frontend/README.md)
 - **Public Dependency**: [@ai-pipestream/grpc-stubs on npm](https://www.npmjs.com/package/@ai-pipestream/grpc-stubs)
 
 ## Support

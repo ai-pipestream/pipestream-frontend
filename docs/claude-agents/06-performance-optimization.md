@@ -25,7 +25,7 @@ Optimize frontend performance focusing on bundle size, lazy loading, streaming e
 **Add bundle analyzer:**
 
 ```typescript
-// apps/platform-shell/ui/vite.config.ts
+// apps/pipestream-frontend/ui/vite.config.ts
 
 import { visualizer } from 'rollup-plugin-visualizer'
 
@@ -71,7 +71,7 @@ export default defineConfig({
 **Update router to lazy-load all route components:**
 
 ```typescript
-// apps/platform-shell/ui/src/router/index.ts
+// apps/pipestream-frontend/ui/src/router/index.ts
 
 const routes = [
   {
@@ -139,7 +139,7 @@ const MappingWorkbench = defineAsyncComponent(() =>
 **Import only used components:**
 
 ```typescript
-// apps/platform-shell/ui/src/plugins/vuetify.ts
+// apps/pipestream-frontend/ui/src/plugins/vuetify.ts
 
 import { createVuetify } from 'vuetify'
 
@@ -399,13 +399,13 @@ const prefetchRoute = (routeName: string) => {
 **Before optimization:**
 ```bash
 pnpm run build
-du -sh apps/platform-shell/public/assets/*.js
+du -sh apps/pipestream-frontend/public/assets/*.js
 ```
 
 **After optimization:**
 ```bash
 pnpm run build
-du -sh apps/platform-shell/public/assets/*.js
+du -sh apps/pipestream-frontend/public/assets/*.js
 # Should see reduction
 ```
 

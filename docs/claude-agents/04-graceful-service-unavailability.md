@@ -19,8 +19,8 @@ Improve UX when services go down by keeping navigation visible but disabled, and
 - Navigation is stable (doesn't reorganize when services change state)
 
 **Files Involved:**
-- `apps/platform-shell/ui/src/stores/serviceRegistry.ts` - Tracks available services
-- `apps/platform-shell/src/index.ts` - Backend generates nav items (line 65-262)
+- `apps/pipestream-frontend/ui/src/stores/serviceRegistry.ts` - Tracks available services
+- `apps/pipestream-frontend/src/index.ts` - Backend generates nav items (line 65-262)
 - `packages/shared-nav/src/components/AppShell.vue` - Navigation shell
 - Navigation state managed by service discovery streams
 
@@ -67,7 +67,7 @@ const CORE_MODULES = [
 
 ### 2. Navigation Item Enhancement
 
-**Update nav item generation (`apps/platform-shell/src/index.ts`):**
+**Update nav item generation (`apps/pipestream-frontend/src/index.ts`):**
 
 **Current (disappearing items):**
 ```typescript
@@ -158,7 +158,7 @@ const serviceNavChildren = sortEntries(groups.services).map(entry => {
 
 ### 4. "Site Dusting" Error Page
 
-**Create `apps/platform-shell/ui/src/pages/ServiceUnavailablePage.vue`:**
+**Create `apps/pipestream-frontend/ui/src/pages/ServiceUnavailablePage.vue`:**
 
 ```vue
 <template>
@@ -272,7 +272,7 @@ onMounted(() => {
 **Update router to catch unavailable services:**
 
 ```typescript
-// apps/platform-shell/ui/src/router/index.ts
+// apps/pipestream-frontend/ui/src/router/index.ts
 
 router.beforeEach(async (to, from, next) => {
   // Extract service name from route path
@@ -564,7 +564,7 @@ docker start repository-service
 ## Deliverables
 
 1. Updated `serviceRegistry.ts` with ServiceStatus model
-2. Updated nav generation in `apps/platform-shell/src/index.ts`
+2. Updated nav generation in `apps/pipestream-frontend/src/index.ts`
 3. Enhanced `AppShell.vue` with status indicators
 4. New `ServiceUnavailablePage.vue` component
 5. Router guards for service availability

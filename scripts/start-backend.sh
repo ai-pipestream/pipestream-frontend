@@ -13,7 +13,7 @@ SERVICE_PORT="38106"
 DESCRIPTION="Express proxy server"
 
 PROJECT_ROOT="$(get_project_root)"
-BACKEND_DIR="$PROJECT_ROOT/apps/platform-shell"
+BACKEND_DIR="$PROJECT_ROOT/apps/pipestream-frontend"
 
 print_status "header" "Starting $SERVICE_NAME"
 print_status "info" "Port: $SERVICE_PORT"

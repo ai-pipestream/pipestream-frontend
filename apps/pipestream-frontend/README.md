@@ -13,7 +13,7 @@ Unified web frontend and Connect-ES proxy for Pipeline Engine platform. Provides
 ## Architecture
 
 ```
-platform-shell/
+pipestream-frontend/
 ├── src/              # Backend (Express + Connect-ES proxy)
 │   ├── index.ts
 │   ├── routes/
@@ -74,15 +74,15 @@ NODE_ENV=production pnpm start
 
 ```bash
 # Build image
-docker build -t ai-pipestream/platform-shell:latest .
+docker build -t ai-pipestream/pipestream-frontend:latest .
 
 # Run
 docker run -d \
-  --name platform-shell \
+  --name pipestream-frontend \
   -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=platform-registration-service \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  ai-pipestream/platform-shell:latest
+  ai-pipestream/pipestream-frontend:latest
 ```
 
 ## Dependencies

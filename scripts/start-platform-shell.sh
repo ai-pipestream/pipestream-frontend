@@ -14,7 +14,7 @@ BACKEND_PORT="38106"
 FRONTEND_PORT="33000"
 
 PROJECT_ROOT="$(get_project_root)"
-SHELL_DIR="$PROJECT_ROOT/apps/platform-shell"
+SHELL_DIR="$PROJECT_ROOT/apps/pipestream-frontend"
 
 print_status "header" "Starting $SERVICE_NAME"
 print_status "info" "Backend Port: $BACKEND_PORT"
@@ -33,7 +33,7 @@ fi
 check_node_version
 ensure_pnpm
 
-# Check if platform-shell directory exists
+# Check if pipestream-frontend directory exists
 if [[ ! -d "$SHELL_DIR" ]]; then
     print_status "error" "Platform shell directory not found: $SHELL_DIR"
     exit 1

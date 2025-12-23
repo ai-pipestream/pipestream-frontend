@@ -1,7 +1,7 @@
-# Multi-stage build for platform-shell (monorepo)
+# Multi-stage build for pipestream-frontend (monorepo)
 # This creates a single container with both the backend proxy and frontend UI
 #
-# Build from monorepo root: docker build -f apps/platform-shell/Dockerfile -t ai-pipestream/pipestream-frontend .
+# Build from monorepo root: docker build -f apps/pipestream-frontend/Dockerfile -t ai-pipestream/pipestream-frontend .
 # Run: docker run -p 38106:38106 ai-pipestream/pipestream-frontend
 
 # Stage 1: Build backend and frontend
@@ -24,8 +24,8 @@ COPY packages/connector-shared/package.json ./packages/connector-shared/
 COPY packages/protobuf-forms/package.json ./packages/protobuf-forms/
 COPY packages/shared-components/package.json ./packages/shared-components/
 COPY packages/shared-nav/package.json ./packages/shared-nav/
-COPY apps/platform-shell/package.json ./apps/platform-shell/
-COPY apps/platform-shell/ui/package.json ./apps/platform-shell/ui/
+COPY apps/pipestream-frontend/package.json ./apps/pipestream-frontend/
+COPY apps/pipestream-frontend/ui/package.json ./apps/pipestream-frontend/ui/
 
 # Install all dependencies (includes UI as workspace member)
 RUN pnpm install --frozen-lockfile
@@ -33,10 +33,10 @@ RUN pnpm install --frozen-lockfile
 # Copy source code for packages
 COPY packages/ ./packages/
 
-# Copy source code for platform-shell
-COPY apps/platform-shell/src ./apps/platform-shell/src
-COPY apps/platform-shell/ui ./apps/platform-shell/ui
-COPY apps/platform-shell/tsconfig.json ./apps/platform-shell/
+# Copy source code for pipestream-frontend
+COPY apps/pipestream-frontend/src ./apps/pipestream-frontend/src
+COPY apps/pipestream-frontend/ui ./apps/pipestream-frontend/ui
+COPY apps/pipestream-frontend/tsconfig.json ./apps/pipestream-frontend/
 
 # Build all packages and apps recursively (handles dependency order automatically)
 RUN pnpm -r build
@@ -59,7 +59,7 @@ COPY --chown=nodejs:nodejs pnpm-workspace.yaml package.json pnpm-lock.yaml .npmr
 # Copy package.json files for workspace
 COPY --chown=nodejs:nodejs packages/connector-shared/package.json ./packages/connector-shared/
 COPY --chown=nodejs:nodejs packages/protobuf-forms/package.json ./packages/protobuf-forms/
-COPY --chown=nodejs:nodejs apps/platform-shell/package.json ./apps/platform-shell/
+COPY --chown=nodejs:nodejs apps/pipestream-frontend/package.json ./apps/pipestream-frontend/
 
 # Install production dependencies + tsx for TypeScript runtime
 # (protobuf-forms exports TypeScript files directly)
@@ -76,17 +76,17 @@ COPY --from=builder --chown=nodejs:nodejs /app/packages/shared-components/dist .
 COPY --from=builder --chown=nodejs:nodejs /app/packages/shared-nav/dist ./packages/shared-nav/dist
 
 # Copy built backend
-COPY --from=builder --chown=nodejs:nodejs /app/apps/platform-shell/dist ./apps/platform-shell/dist
+COPY --from=builder --chown=nodejs:nodejs /app/apps/pipestream-frontend/dist ./apps/pipestream-frontend/dist
 
 # Copy built frontend (static assets)
-# Vite builds to apps/platform-shell/public
-COPY --from=builder --chown=nodejs:nodejs /app/apps/platform-shell/public ./apps/platform-shell/public
+# Vite builds to apps/pipestream-frontend/public
+COPY --from=builder --chown=nodejs:nodejs /app/apps/pipestream-frontend/public ./apps/pipestream-frontend/public
 
 # Switch to non-root user
 USER nodejs
 
 # Set working directory to app
-WORKDIR /app/apps/platform-shell
+WORKDIR /app/apps/pipestream-frontend
 
 # Environment variables with sensible defaults
 ENV NODE_ENV=production

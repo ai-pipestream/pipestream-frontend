@@ -43,8 +43,8 @@ The platform is architected to get frontend developers productive IMMEDIATELY:
 
 **Current Manual Process:**
 1. User manually starts platform-registration-service (Java/Gradle)
-2. User manually starts platform-shell backend (Node/Express)
-3. User manually starts platform-shell UI (Vite dev server)
+2. User manually starts pipestream-frontend backend (Node/Express)
+3. User manually starts pipestream-frontend UI (Vite dev server)
 4. User ensures correct ports and environment variables
 5. User troubleshoots if anything is misconfigured
 
@@ -118,8 +118,8 @@ Only needed if modifying grpc-stubs or platform-libraries:
 **Port Availability:**
 Agent should check these ports are free:
 - 38101 - platform-registration-service (gRPC)
-- 38106 - platform-shell backend (Express + Connect)
-- 33000 - platform-shell UI (Vite dev server)
+- 38106 - pipestream-frontend backend (Express + Connect)
+- 33000 - pipestream-frontend UI (Vite dev server)
 
 ## Step-by-Step Startup Sequence
 
@@ -237,7 +237,7 @@ ls packages/shared-nav/dist/ >/dev/null 2>&1 || {
 ### Step 4: Platform Shell Backend (Web Proxy)
 
 ```bash
-cd ~/IdeaProjects/ai-pipestream/platform-frontend/apps/platform-shell
+cd ~/IdeaProjects/ai-pipestream/platform-frontend/apps/pipestream-frontend
 
 # Build backend TypeScript
 pnpm run build
@@ -249,16 +249,16 @@ export PLATFORM_REGISTRATION_PORT=38101
 export NODE_ENV=development
 
 # Start backend in background
-node dist/index.js > /tmp/platform-shell-backend.log 2>&1 &
+node dist/index.js > /tmp/pipestream-frontend-backend.log 2>&1 &
 BACKEND_PID=$!
-echo "Started platform-shell backend (PID: $BACKEND_PID)"
+echo "Started pipestream-frontend backend (PID: $BACKEND_PID)"
 
 # Wait for backend to be ready
-echo "Waiting for platform-shell backend to be ready..."
+echo "Waiting for pipestream-frontend backend to be ready..."
 for i in {1..20}; do
   curl -f http://localhost:38106/proxy/health >/dev/null 2>&1
   if [ $? -eq 0 ]; then
-    echo "✓ platform-shell backend is healthy"
+    echo "✓ pipestream-frontend backend is healthy"
     break
   fi
   echo "Attempt $i/20: Waiting for backend..."
@@ -267,9 +267,9 @@ done
 
 # Verify backend is running
 curl -f http://localhost:38106/proxy/health || {
-  echo "ERROR: platform-shell backend failed to start"
+  echo "ERROR: pipestream-frontend backend failed to start"
   echo "Logs:"
-  tail -50 /tmp/platform-shell-backend.log
+  tail -50 /tmp/pipestream-frontend-backend.log
   exit 1
 }
 ```
@@ -277,16 +277,16 @@ curl -f http://localhost:38106/proxy/health || {
 ### Step 5: Platform Shell UI (Vite Dev Server)
 
 ```bash
-cd ~/IdeaProjects/ai-pipestream/platform-frontend/apps/platform-shell/ui
+cd ~/IdeaProjects/ai-pipestream/platform-frontend/apps/pipestream-frontend/ui
 
 # Set environment variables
 export VITE_BACKEND_URL=http://localhost:38106
 export VITE_DEV_SERVER_PORT=33000
 
 # Start Vite dev server in background
-pnpm run dev > /tmp/platform-shell-ui.log 2>&1 &
+pnpm run dev > /tmp/pipestream-frontend-ui.log 2>&1 &
 UI_PID=$!
-echo "Started platform-shell UI (PID: $UI_PID)"
+echo "Started pipestream-frontend UI (PID: $UI_PID)"
 
 # Wait for Vite to be ready
 echo "Waiting for Vite dev server to be ready..."
@@ -304,7 +304,7 @@ done
 curl -f http://localhost:33000/ || {
   echo "ERROR: Vite dev server failed to start"
   echo "Logs:"
-  tail -50 /tmp/platform-shell-ui.log
+  tail -50 /tmp/pipestream-frontend-ui.log
   exit 1
 }
 ```
@@ -324,8 +324,8 @@ echo "  - Platform Shell UI:      http://localhost:33000"
 echo ""
 echo "Process IDs:"
 echo "  - platform-registration-service: $REGISTRATION_PID"
-echo "  - platform-shell backend:        $BACKEND_PID"
-echo "  - platform-shell UI:             $UI_PID"
+echo "  - pipestream-frontend backend:        $BACKEND_PID"
+echo "  - pipestream-frontend UI:             $UI_PID"
 echo ""
 echo "Quick Tests:"
 echo ""
@@ -336,12 +336,12 @@ grpcurl -plaintext -d '{}' localhost:38101 ai.pipestream.platform.registration.P
 echo "   ✓ Responding to gRPC calls"
 
 # Test backend proxy
-echo "2. Testing platform-shell backend..."
+echo "2. Testing pipestream-frontend backend..."
 curl -s http://localhost:38106/api/system-status | jq '.proxy.status'
 echo "   ✓ Backend proxy is healthy"
 
 # Test UI
-echo "3. Testing platform-shell UI..."
+echo "3. Testing pipestream-frontend UI..."
 curl -s http://localhost:33000/ | grep -q "<!DOCTYPE html>" && echo "   ✓ UI is serving HTML"
 
 echo ""
@@ -352,8 +352,8 @@ echo "  📊 Health:   http://localhost:33000/health"
 echo ""
 echo "Logs:"
 echo "  tail -f /tmp/platform-registration.log"
-echo "  tail -f /tmp/platform-shell-backend.log"
-echo "  tail -f /tmp/platform-shell-ui.log"
+echo "  tail -f /tmp/pipestream-frontend-backend.log"
+echo "  tail -f /tmp/pipestream-frontend-ui.log"
 echo ""
 echo "To stop all services:"
 echo "  kill $REGISTRATION_PID $BACKEND_PID $UI_PID"
@@ -411,13 +411,13 @@ services:
       timeout: 5s
       retries: 5
 
-  platform-shell:
+  pipestream-frontend:
     depends_on:
       platform-registration:
         condition: service_healthy
     build:
       context: .
-      dockerfile: apps/platform-shell/Dockerfile
+      dockerfile: apps/pipestream-frontend/Dockerfile
     ports:
       - "38106:38106"
       - "33000:33000"
@@ -427,7 +427,7 @@ services:
       - PLATFORM_REGISTRATION_HOST=platform-registration
       - PLATFORM_REGISTRATION_PORT=38101
     volumes:
-      - ./apps/platform-shell/ui:/app/apps/platform-shell/ui
+      - ./apps/pipestream-frontend/ui:/app/apps/pipestream-frontend/ui
       - ./packages:/app/packages
     command: pnpm run dev
 ```
@@ -532,11 +532,11 @@ Agent: [Step 3/5] Building platform-frontend packages...
 Agent: <runs pnpm install and build>
 ✓ All packages built successfully
 
-Agent: [Step 4/5] Starting platform-shell backend...
+Agent: [Step 4/5] Starting pipestream-frontend backend...
 Agent: <uses Bash tool with run_in_background>
 ✓ Backend is serving at http://localhost:38106
 
-Agent: [Step 5/5] Starting platform-shell UI...
+Agent: [Step 5/5] Starting pipestream-frontend UI...
 Agent: <uses Bash tool with run_in_background>
 ✓ Vite dev server ready at http://localhost:33000
 
@@ -548,8 +548,8 @@ Agent: Open http://localhost:33000 in your browser
 Agent:
 Agent: Services:
 Agent:   • platform-registration-service (gRPC): localhost:38101
-Agent:   • platform-shell backend (API): http://localhost:38106
-Agent:   • platform-shell UI (dev): http://localhost:33000
+Agent:   • pipestream-frontend backend (API): http://localhost:38106
+Agent:   • pipestream-frontend UI (dev): http://localhost:33000
 Agent:
 Agent: Processes running in background (use BashOutput tool to check logs)
 Agent:

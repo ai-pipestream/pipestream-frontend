@@ -39,7 +39,7 @@ sequenceDiagram
 
 ### 3.1. Platform Shell Application
 
-**Location:** `apps/platform-shell/ui/src/App.vue`
+**Location:** `apps/pipestream-frontend/ui/src/App.vue`
 
 **Structure:**
 - Vue 3 SPA using Composition API with `<script setup>`
@@ -129,7 +129,7 @@ const navItems = computed(() => {
 
 ### 3.2. Service Registry Store (Pinia)
 
-**Location:** `apps/platform-shell/ui/src/stores/serviceRegistry.ts`
+**Location:** `apps/pipestream-frontend/ui/src/stores/serviceRegistry.ts`
 
 **Responsibilities:**
 - Maintains real-time Sets of available services and modules
@@ -246,9 +246,9 @@ interface NavShellProps {
   rail?: boolean;              // Mini drawer mode
   permanent?: boolean;         // Always visible drawer
   expandOnHover?: boolean;     // Expand on hover in rail mode
-  autoLoadMenu?: boolean;      // Fetch items via HTTP (not used in platform-shell)
-  itemsUrl?: string;           // URL to fetch items from (not used in platform-shell)
-  periodicRefreshMs?: number;  // Auto-refresh interval (not used in platform-shell)
+  autoLoadMenu?: boolean;      // Fetch items via HTTP (not used in pipestream-frontend)
+  itemsUrl?: string;           // URL to fetch items from (not used in pipestream-frontend)
+  periodicRefreshMs?: number;  // Auto-refresh interval (not used in pipestream-frontend)
 }
 
 interface NavItem {
@@ -269,11 +269,11 @@ interface NavItem {
 
 ### 3.4. Alternative: HTTP Menu Endpoint (Available but Unused)
 
-The platform-shell **backend** provides an HTTP endpoint for menu items, but the frontend doesn't use it:
+The pipestream-frontend **backend** provides an HTTP endpoint for menu items, but the frontend doesn't use it:
 
 **Endpoint:** `GET /connect/system-nav/menu-items.json`
 
-**Implementation:** `apps/platform-shell/src/index.ts`
+**Implementation:** `apps/pipestream-frontend/src/index.ts`
 
 This endpoint:
 - Calls `listServices()` and `listModules()` on platform-registration
@@ -359,7 +359,7 @@ Shown only if at least one module is available:
 
 ## 6. Routing Architecture
 
-**Location:** `apps/platform-shell/ui/src/router/index.ts`
+**Location:** `apps/pipestream-frontend/ui/src/router/index.ts`
 
 ### Route Categories
 
@@ -448,7 +448,7 @@ const serviceRoutes = [
 
 **Step 3:** Create UI:
 ```
-apps/platform-shell/ui/src/services/my-new-service/
+apps/pipestream-frontend/ui/src/services/my-new-service/
 ├── src/
 │   ├── App.vue
 │   ├── views/
@@ -466,7 +466,7 @@ Platform Shell uses an **embedded architecture** where service UIs are integrate
 ### Structure
 
 ```
-apps/platform-shell/ui/src/
+apps/pipestream-frontend/ui/src/
 ├── services/                    # Embedded service UIs
 │   ├── account-manager/
 │   │   └── src/
@@ -496,7 +496,7 @@ apps/platform-shell/ui/src/
 ### Trade-offs
 
 - **Monolithic bundle**: All service UIs bundled together
-- **Coupled releases**: Services update together with platform-shell
+- **Coupled releases**: Services update together with pipestream-frontend
 - **Build complexity**: Changes to any service rebuild entire platform
 
 ## 9. System Health and Error Handling
@@ -522,7 +522,7 @@ onMounted(async () => {
 
 ### SystemError Component
 
-**Location:** `apps/platform-shell/ui/src/components/SystemError.vue`
+**Location:** `apps/pipestream-frontend/ui/src/components/SystemError.vue`
 
 Displays a beautiful error page when critical services are unavailable:
 - Shows system diagnostics
@@ -554,7 +554,7 @@ Displays a beautiful error page when critical services are unavailable:
 
 ```bash
 # From monorepo root
-./scripts/start-platform-shell.sh
+./scripts/start-pipestream-frontend.sh
 
 # Or separately
 ./scripts/start-backend.sh      # Backend on :38106
@@ -572,7 +572,7 @@ Displays a beautiful error page when critical services are unavailable:
 
 ### Environment Configuration
 
-Create `.env` in `apps/platform-shell/ui/`:
+Create `.env` in `apps/pipestream-frontend/ui/`:
 
 ```bash
 VITE_BACKEND_URL=http://localhost:38106
@@ -589,14 +589,14 @@ VITE_GRPC_DEBUG=true
 # From monorepo root
 pnpm build  # Builds all packages + backend + frontend
 
-# Backend output: apps/platform-shell/dist/
-# Frontend output: apps/platform-shell/public/
+# Backend output: apps/pipestream-frontend/dist/
+# Frontend output: apps/pipestream-frontend/public/
 ```
 
 ### Running in Production
 
 ```bash
-cd apps/platform-shell
+cd apps/pipestream-frontend
 NODE_ENV=production pnpm start
 ```
 
@@ -612,13 +612,13 @@ NODE_ENV=production pnpm start
 
 ```bash
 # Build
-docker build -f apps/platform-shell/Dockerfile -t platform-shell .
+docker build -f apps/pipestream-frontend/Dockerfile -t pipestream-frontend .
 
 # Run
-docker run -d --name platform-shell -p 38106:38106 \
+docker run -d --name pipestream-frontend -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=platform-registration-service \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  platform-shell
+  pipestream-frontend
 ```
 
 ## 13. Key Design Decisions
@@ -650,7 +650,7 @@ docker run -d --name platform-shell -p 38106:38106 \
 
 ### Embedded vs Separate Frontends
 
-**Decision:** Embed service UIs within platform-shell application.
+**Decision:** Embed service UIs within pipestream-frontend application.
 
 **Benefits:**
 - Unified deployment (single Docker image)

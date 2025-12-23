@@ -29,7 +29,7 @@ Interactive gallery where developers can:
 
 ### Option A: Enhanced Built-in Gallery
 
-**Enhance existing `apps/platform-shell/ui/src/pages/ComponentsPage.vue`:**
+**Enhance existing `apps/pipestream-frontend/ui/src/pages/ComponentsPage.vue`:**
 
 **Features to add:**
 1. Auto-generate component list from packages
@@ -233,7 +233,7 @@ const components = scanComponentDirectory('packages/shared-components/src/compon
 const metadata = components.map(extractMetadata)
 
 fs.writeFileSync(
-  'apps/platform-shell/ui/src/data/component-metadata.json',
+  'apps/pipestream-frontend/ui/src/data/component-metadata.json',
   JSON.stringify(metadata, null, 2)
 )
 ```

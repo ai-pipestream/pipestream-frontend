@@ -374,5 +374,5 @@ describe('ProtobufForm Component', () => {
 
 - Current (disabled) component: `packages/protobuf-forms/src/vue.ts`
 - JSONForms docs: https://jsonforms.io/docs
-- Example manual form: `apps/platform-shell/ui/src/services/account-manager/src/views/AccountEditView.vue`
+- Example manual form: `apps/pipestream-frontend/ui/src/services/account-manager/src/views/AccountEditView.vue`
 - Proto schemas: From `@ai-pipestream/grpc-stubs` package

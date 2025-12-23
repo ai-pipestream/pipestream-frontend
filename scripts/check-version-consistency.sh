@@ -68,8 +68,8 @@ echo ""
 
 APP_FILES=(
   "$PROJECT_ROOT/package.json"
-  "$PROJECT_ROOT/apps/platform-shell/package.json"
-  "$PROJECT_ROOT/apps/platform-shell/ui/package.json"
+  "$PROJECT_ROOT/apps/pipestream-frontend/package.json"
+  "$PROJECT_ROOT/apps/pipestream-frontend/ui/package.json"
 )
 
 for dep in "${COMMON_DEPS[@]}"; do

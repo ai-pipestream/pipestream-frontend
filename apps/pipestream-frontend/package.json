@@ -1,5 +1,5 @@
 {
-  "name": "@ai-pipestream/platform-shell",
+  "name": "@ai-pipestream/pipestream-frontend",
   "version": "1.0.0",
   "description": "Platform Shell - Unified web frontend and Connect-ES proxy for Pipeline Engine services",
   "type": "module",
@@ -13,8 +13,8 @@
     "start": "node dist/index.js",
     "test:upload:dev": "tsx scripts/test-upload-chunks.ts",
     "start:dev": "tsx src/index.ts",
-    "docker:build": "docker build -t ai-pipestream/platform-shell .",
-    "docker:run": "docker run -p 38106:38106 ai-pipestream/platform-shell",
+    "docker:build": "docker build -t ai-pipestream/pipestream-frontend .",
+    "docker:run": "docker run -p 38106:38106 ai-pipestream/pipestream-frontend",
     "docker:compose": "docker-compose up -d",
     "dev:all": "concurrently \"pnpm run dev\" \"pnpm run dev:ui\"",
     "dev:backend": "tsx watch src/index.ts",

@@ -62,7 +62,7 @@ export async function getCurrentUser() {
 
 ### 2. Auth Store (Pinia)
 
-**Create `apps/platform-shell/ui/src/stores/auth.ts`:**
+**Create `apps/pipestream-frontend/ui/src/stores/auth.ts`:**
 
 ```typescript
 import { defineStore } from 'pinia'
@@ -258,7 +258,7 @@ const routes = [
 
 ### 5. Login Page
 
-**Create `apps/platform-shell/ui/src/pages/LoginPage.vue`:**
+**Create `apps/pipestream-frontend/ui/src/pages/LoginPage.vue`:**
 
 ```vue
 <template>

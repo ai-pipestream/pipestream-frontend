@@ -251,7 +251,7 @@ export function handleGrpcError(error: unknown): UserFriendlyError {
 
 ### 4. Global Error Handler
 
-**Update `apps/platform-shell/ui/src/main.ts`:**
+**Update `apps/pipestream-frontend/ui/src/main.ts`:**
 
 ```typescript
 import { createApp } from 'vue'
@@ -288,7 +288,7 @@ window.addEventListener('unhandledrejection', (event) => {
 
 ### 5. Notification Store
 
-**Create `apps/platform-shell/ui/src/stores/notifications.ts`:**
+**Create `apps/pipestream-frontend/ui/src/stores/notifications.ts`:**
 
 ```typescript
 import { defineStore } from 'pinia'
@@ -402,7 +402,7 @@ try {
 **Create backend endpoint to receive frontend logs:**
 
 ```typescript
-// apps/platform-shell/src/index.ts
+// apps/pipestream-frontend/src/index.ts
 
 app.post('/api/logs', (req, res) => {
   const { level, context, message, data, timestamp } = req.body

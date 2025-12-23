@@ -4,13 +4,13 @@ This document explains the mechanisms by which frontend applications discover th
 
 ## 1. Service Discovery
 
-The core principle of the architecture is that frontend applications do not need to know the specific host and port of the backend services they need to communicate with. This is handled automatically by the **platform-shell backend**.
+The core principle of the architecture is that frontend applications do not need to know the specific host and port of the backend services they need to communicate with. This is handled automatically by the **pipestream-frontend backend**.
 
-Service discovery is managed through platform-registration-service, which maintains a registry of all available services and modules. The platform-shell backend maintains a persistent streaming connection to the service registry, allowing it to respond to service discovery changes in real-time.
+Service discovery is managed through platform-registration-service, which maintains a registry of all available services and modules. The pipestream-frontend backend maintains a persistent streaming connection to the service registry, allowing it to respond to service discovery changes in real-time.
 
 ### Architecture Layers
 
-**Backend Layer (platform-shell):**
+**Backend Layer (pipestream-frontend):**
 - Maintains live service registry via `WatchServices` stream
 - Resolves service names to host:port at request time
 - Creates dynamic gRPC transports to backend services
@@ -49,7 +49,7 @@ sequenceDiagram
 
 ### Backend Service Discovery Implementation
 
-**Location:** `apps/platform-shell/src/lib/serviceResolver.ts`
+**Location:** `apps/pipestream-frontend/src/lib/serviceResolver.ts`
 
 ```typescript
 import { createClient } from "@connectrpc/connect";
@@ -123,7 +123,7 @@ watchAndCacheServices();
 
 ### Frontend Service Discovery Implementation
 
-**Location:** `apps/platform-shell/ui/src/stores/serviceRegistry.ts`
+**Location:** `apps/pipestream-frontend/ui/src/stores/serviceRegistry.ts`
 
 The frontend uses a **Pinia store** to maintain reactive service/module availability:
 
@@ -174,7 +174,7 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
 When a Vue component needs to call a backend service:
 
 1. **Client Call:** Component makes a call using Connect-RPC client
-2. **Proxy Route:** Request sent to platform-shell backend (`window.location.origin`)
+2. **Proxy Route:** Request sent to pipestream-frontend backend (`window.location.origin`)
 3. **Route Handler:** Platform-shell matches call to service route in `connectRoutes.ts`
 4. **Transport Creation:** Handler calls `createDynamicTransport("service-name")`
 5. **Live Registry Lookup:** `resolveService()` performs synchronous lookup in in-memory map
@@ -264,7 +264,7 @@ for await (const response of client.watch({})) {
 
 ### Method 2: Aggregated Health Stream (Platform-Level)
 
-For a high-level overview of the entire platform's status, the platform-shell backend provides a custom, aggregated health stream.
+For a high-level overview of the entire platform's status, the pipestream-frontend backend provides a custom, aggregated health stream.
 
 ```mermaid
 sequenceDiagram
@@ -294,7 +294,7 @@ sequenceDiagram
 The frontend uses the `useShellHealth` composable:
 
 ```typescript
-// apps/platform-shell/ui/src/composables/useShellHealth.ts
+// apps/pipestream-frontend/ui/src/composables/useShellHealth.ts
 import { ref } from 'vue';
 import { createClient } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-web';
@@ -373,7 +373,7 @@ const { updates, isConnected, error } = useShellHealth();
 
 **Backend Implementation:**
 
-The `ShellService` in platform-shell backend (`src/routes/connectRoutes.ts`) aggregates health from all services:
+The `ShellService` in pipestream-frontend backend (`src/routes/connectRoutes.ts`) aggregates health from all services:
 
 1. Fetches all registered services from platform-registration
 2. Filters for resolvable gRPC services
@@ -396,7 +396,7 @@ The `ShellService` in platform-shell backend (`src/routes/connectRoutes.ts`) agg
 
 ### Pattern 1: Navigation Menu (Pinia Store)
 
-**Location:** `apps/platform-shell/ui/src/stores/serviceRegistry.ts`
+**Location:** `apps/pipestream-frontend/ui/src/stores/serviceRegistry.ts`
 
 The main navigation uses a Pinia store that streams service/module availability:
 
@@ -492,7 +492,7 @@ const isAccountServiceAvailable = computed(() =>
 
 ## 5. Backend Service Discovery (for Reference)
 
-When the platform-shell backend needs to call another service:
+When the pipestream-frontend backend needs to call another service:
 
 ```typescript
 // From connectRoutes.ts
@@ -589,7 +589,7 @@ curl -X POST http://localhost:38106/connect/system/invalidate-cache
 
 **Check:**
 1. Platform-registration-service running?
-2. Network connectivity to platform-shell backend?
+2. Network connectivity to pipestream-frontend backend?
 3. Browser console for Connect errors
 4. Backend logs for stream errors
 
@@ -600,13 +600,13 @@ curl -X POST http://localhost:38106/connect/system/invalidate-cache
 ## 9. Related Components and Files
 
 ### Backend
-- `apps/platform-shell/src/lib/serviceResolver.ts` - Service discovery logic
-- `apps/platform-shell/src/routes/connectRoutes.ts` - Service routing and ShellService
-- `apps/platform-shell/src/index.ts` - REST endpoints for health/nav
+- `apps/pipestream-frontend/src/lib/serviceResolver.ts` - Service discovery logic
+- `apps/pipestream-frontend/src/routes/connectRoutes.ts` - Service routing and ShellService
+- `apps/pipestream-frontend/src/index.ts` - REST endpoints for health/nav
 
 ### Frontend
-- `apps/platform-shell/ui/src/stores/serviceRegistry.ts` - Pinia store for availability
-- `apps/platform-shell/ui/src/composables/useShellHealth.ts` - Aggregated health composable
+- `apps/pipestream-frontend/ui/src/stores/serviceRegistry.ts` - Pinia store for availability
+- `apps/pipestream-frontend/ui/src/composables/useShellHealth.ts` - Aggregated health composable
 - `packages/shared-components/src/components/GrpcHealthStatus.vue` - Health indicator component
 
 ## 10. Related Documentation

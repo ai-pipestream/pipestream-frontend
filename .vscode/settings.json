@@ -102,7 +102,7 @@
   // Project Structure Recognition
   // ============================================
   // Main Node.js projects:
-  // 1. apps/platform-shell (backend Express + frontend Vue)
-  // 2. apps/platform-shell/ui (Vue 3 + Vuetify frontend)
+  // 1. apps/pipestream-frontend (backend Express + frontend Vue)
+  // 2. apps/pipestream-frontend/ui (Vue 3 + Vuetify frontend)
   // Packages: shared-components, shared-nav, connector-shared, protobuf-forms
 }

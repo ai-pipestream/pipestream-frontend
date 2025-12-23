@@ -22,7 +22,7 @@ stages:
 
 variables:
   PROTO_PROVIDER: gitlab
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/platform-shell
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/pipestream-frontend
   # For Docker-in-Docker
   DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
@@ -53,8 +53,8 @@ build:
     paths:
       - packages/*/dist/
       - packages/protobuf-forms/src/generated/
-      - apps/platform-shell/dist/
-      - apps/platform-shell/public/
+      - apps/pipestream-frontend/dist/
+      - apps/pipestream-frontend/public/
       - node_modules/
       - packages/*/node_modules/
       - apps/*/node_modules/
@@ -85,7 +85,7 @@ docker-build:
         --cache-to type=registry,ref=$DOCKER_IMAGE:cache,mode=max \
         -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA \
         -t $DOCKER_IMAGE:$CI_COMMIT_REF_SLUG \
-        -f apps/platform-shell/Dockerfile.gitlab \
+        -f apps/pipestream-frontend/Dockerfile.gitlab \
         .
     - |
       if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
@@ -93,7 +93,7 @@ docker-build:
           --platform linux/amd64,linux/arm64 \
           --push \
           -t $DOCKER_IMAGE:latest \
-          -f apps/platform-shell/Dockerfile.gitlab \
+          -f apps/pipestream-frontend/Dockerfile.gitlab \
           .
       fi
   rules:
@@ -158,10 +158,10 @@ publish-dockerhub:
     - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - crane auth login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN docker.io
   script:
-    - crane copy $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA docker.io/$DOCKER_HUB_USER/platform-shell:$CI_COMMIT_SHORT_SHA
+    - crane copy $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA docker.io/$DOCKER_HUB_USER/pipestream-frontend:$CI_COMMIT_SHORT_SHA
     - |
       if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
-        crane copy $DOCKER_IMAGE:latest docker.io/$DOCKER_HUB_USER/platform-shell:latest
+        crane copy $DOCKER_IMAGE:latest docker.io/$DOCKER_HUB_USER/pipestream-frontend:latest
       fi
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

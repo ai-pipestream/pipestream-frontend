@@ -2,7 +2,7 @@
 
 ## 1. Purpose and Role
 
-The **platform-shell backend** (located at `apps/platform-shell/src/`) is a critical component that bridges the gap between browser-based frontends and backend gRPC services. Since browsers cannot make native HTTP/2 connections required for gRPC, the platform-shell serves as an intelligent gateway that provides several key capabilities:
+The **pipestream-frontend backend** (located at `apps/pipestream-frontend/src/`) is a critical component that bridges the gap between browser-based frontends and backend gRPC services. Since browsers cannot make native HTTP/2 connections required for gRPC, the pipestream-frontend serves as an intelligent gateway that provides several key capabilities:
 
 - **Protocol Translation**: Converts browser-friendly Connect-RPC (gRPC-web over HTTP/1.1) to native gRPC (HTTP/2) for backend services
 - **Dynamic Service Discovery**: Automatically finds the network location of healthy service instances by querying platform-registration-service
@@ -23,13 +23,13 @@ graph TD
     C -- Service Registry --> B;
 ```
 
-Frontend applications make Connect-RPC calls to the platform-shell, which routes them to the appropriate backend services without the frontend needing to know where they are or how to talk to them. This happens by "watching" the platform-registration-service for which services are discoverable and then routing requests appropriately.
+Frontend applications make Connect-RPC calls to the pipestream-frontend, which routes them to the appropriate backend services without the frontend needing to know where they are or how to talk to them. This happens by "watching" the platform-registration-service for which services are discoverable and then routing requests appropriately.
 
 ## 3. Key Features & Implementation
 
 ### 3.1. Live Service Discovery
 
-The platform-shell uses a real-time, streaming approach for service discovery, ensuring it always has an up-to-date list of healthy backend services. It does **not** use a polling or time-based cache mechanism.
+The pipestream-frontend uses a real-time, streaming approach for service discovery, ensuring it always has an up-to-date list of healthy backend services. It does **not** use a polling or time-based cache mechanism.
 
 **Implementation:** On startup, `serviceResolver.ts` establishes a persistent gRPC streaming connection to platform-registration-service by calling the `WatchServices` RPC. The resolver then listens for updates. Whenever a service is registered, unregistered, or changes its health status, the registration service sends a complete, new list of all healthy services. This list populates an in-memory map, which acts as a live service registry.
 
@@ -105,7 +105,7 @@ watchAndCacheServices();
 
 ### 3.2. Service Routing Patterns
 
-The platform-shell uses `@connectrpc/connect-express` to define Connect-RPC routes for each gRPC service in `src/routes/connectRoutes.ts`.
+The pipestream-frontend uses `@connectrpc/connect-express` to define Connect-RPC routes for each gRPC service in `src/routes/connectRoutes.ts`.
 
 **Client Allocation Pattern:** Clients are created **on-demand for each request** rather than as singletons. This pattern:
 - Allows dynamic transport resolution per request
@@ -240,7 +240,7 @@ router.service(NodeUploadService, {
 
 ### 3.3. Service Aggregation (`ShellService`)
 
-A `ShellService` is implemented directly within the platform-shell backend. This service is not a simple pass-through; it acts as a Backend-for-Frontend (BFF). It:
+A `ShellService` is implemented directly within the pipestream-frontend backend. This service is not a simple pass-through; it acts as a Backend-for-Frontend (BFF). It:
 
 1. Fetches all registered services from platform-registration
 2. Filters for resolvable gRPC services
@@ -293,7 +293,7 @@ router.service(ShellService, {
 
 ### 3.4. Proto Types
 
-The platform-shell uses **published TypeScript types** from `@ai-pipestream/grpc-stubs` rather than generating its own:
+The pipestream-frontend uses **published TypeScript types** from `@ai-pipestream/grpc-stubs` rather than generating its own:
 
 ```typescript
 import { PlatformRegistration } from "@ai-pipestream/grpc-stubs/dist/registration/platform_registration_pb";
@@ -537,7 +537,7 @@ router.service(Health, {
 ./scripts/start-frontend.sh
 
 # Or start both together
-./scripts/start-platform-shell.sh
+./scripts/start-pipestream-frontend.sh
 ```
 
 **Request Flow in Development:**
@@ -551,9 +551,9 @@ The Vite dev server proxies Connect-RPC requests (matching `/ai.pipestream.*`) t
 
 ```bash
 # From monorepo root
-pnpm build  # Builds all packages + platform-shell backend + frontend
+pnpm build  # Builds all packages + pipestream-frontend backend + frontend
 
-# Or from apps/platform-shell
+# Or from apps/pipestream-frontend
 pnpm build      # Backend (TypeScript → dist/)
 pnpm build:ui   # Frontend (Vite → public/)
 pnpm build:all  # Both
@@ -573,21 +573,21 @@ In production, the Express server serves both the static frontend files and acts
 
 ```bash
 # Build from monorepo root (required)
-docker build -f apps/platform-shell/Dockerfile -t platform-shell .
+docker build -f apps/pipestream-frontend/Dockerfile -t pipestream-frontend .
 
 # Run container
-docker run -d --name platform-shell -p 38106:38106 \
+docker run -d --name pipestream-frontend -p 38106:38106 \
   -e PLATFORM_REGISTRATION_HOST=platform-registration-service \
   -e PLATFORM_REGISTRATION_PORT=38101 \
-  platform-shell
+  pipestream-frontend
 
 # Pull pre-built image
-docker pull ghcr.io/ai-pipestream/platform-shell:latest
+docker pull ghcr.io/ai-pipestream/pipestream-frontend:latest
 ```
 
 ## 9. Frontend Integration
 
-Frontend applications use `window.location.origin` to connect to platform-shell, which works in both development and production:
+Frontend applications use `window.location.origin` to connect to pipestream-frontend, which works in both development and production:
 
 ```typescript
 import { createClient } from '@connectrpc/connect';
@@ -596,7 +596,7 @@ import { AccountService } from '@ai-pipestream/grpc-stubs/dist/repository/accoun
 
 // Create transport - works in dev and production
 const transport = createConnectTransport({
-  baseUrl: window.location.origin,  // Smart routing to platform-shell
+  baseUrl: window.location.origin,  // Smart routing to pipestream-frontend
   useBinaryFormat: true              // Use binary protobuf for performance
 });
 
@@ -609,11 +609,11 @@ const response = await accountClient.listAccounts({});
 
 **In Development:**
 - `window.location.origin` = `http://localhost:33000`
-- Vite proxies `/ai.pipestream.*` to platform-shell at `:38106`
+- Vite proxies `/ai.pipestream.*` to pipestream-frontend at `:38106`
 
 **In Production:**
 - `window.location.origin` = production URL
-- Direct connection to platform-shell
+- Direct connection to pipestream-frontend
 
 ## 10. Error Handling and Resilience
 
@@ -669,7 +669,7 @@ This clears the in-memory service registry map and forces fresh resolution on th
 - **NodeUploadService** - File upload streaming
 - **PipeStepProcessor** - Module configuration and processing (requires x-target-backend)
 - **Health** - Health checks (supports x-target-backend)
-- **ShellService** - Aggregated health stream (implemented in platform-shell)
+- **ShellService** - Aggregated health stream (implemented in pipestream-frontend)
 
 ### Adding a New Service Route
 
@@ -691,7 +691,7 @@ router.service(MyNewService, {
 ```
 
 3. Ensure the service is registered with platform-registration-service
-4. Frontend can now call the service through platform-shell
+4. Frontend can now call the service through pipestream-frontend
 
 ## 12. Future Enhancements
 

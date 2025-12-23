@@ -4,7 +4,7 @@ This document provides practical examples for making gRPC calls from both a Node
 
 ## Making gRPC Calls in Backend TypeScript (Node.js)
 
-This pattern is used in the `platform-shell` backend to call other backend services.
+This pattern is used in the `pipestream-frontend` backend to call other backend services.
 
 ### Non-Streaming Calls
 
@@ -118,7 +118,7 @@ async function watchWithCancel() {
 
 ## Making gRPC Calls in Vue TypeScript (Frontend)
 
-This pattern is used in the various Vue.js applications to communicate with backend services through the platform-shell proxy.
+This pattern is used in the various Vue.js applications to communicate with backend services through the pipestream-frontend proxy.
 
 ### Setup - Singleton Client Pattern (Recommended)
 
@@ -137,7 +137,7 @@ import {
   type Account
 } from '@ai-pipestream/grpc-stubs/dist/repository/account/account_service_pb';
 
-// Create transport to platform-shell (which proxies to backend services)
+// Create transport to pipestream-frontend (which proxies to backend services)
 // Uses window.location.origin so it works in dev and production
 const transport = createConnectTransport({
   baseUrl: window.location.origin,

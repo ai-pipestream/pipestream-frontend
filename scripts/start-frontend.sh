@@ -13,7 +13,7 @@ SERVICE_PORT="33000"
 DESCRIPTION="Vue.js UI with hot-reload"
 
 PROJECT_ROOT="$(get_project_root)"
-FRONTEND_DIR="$PROJECT_ROOT/apps/platform-shell/ui"
+FRONTEND_DIR="$PROJECT_ROOT/apps/pipestream-frontend/ui"
 
 print_status "header" "Starting $SERVICE_NAME"
 print_status "info" "Port: $SERVICE_PORT"

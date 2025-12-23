@@ -33,8 +33,8 @@ jobs:
       - name: Verify build artifacts
         run: |
           echo "=== Platform Shell artifacts ==="
-          ls -la apps/platform-shell/dist/ || echo "No backend dist"
-          ls -la apps/platform-shell/public/ || echo "No frontend dist"
+          ls -la apps/pipestream-frontend/dist/ || echo "No backend dist"
+          ls -la apps/pipestream-frontend/public/ || echo "No frontend dist"
           echo "=== Package artifacts ==="
           ls -la packages/*/dist/ || echo "No package dists"
 
@@ -76,25 +76,25 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: apps/platform-shell/Dockerfile
+          file: apps/pipestream-frontend/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/ai-pipestream/platform-shell:${{ steps.version.outputs.tag }}
-            ghcr.io/ai-pipestream/platform-shell:latest
+            ghcr.io/ai-pipestream/pipestream-frontend:${{ steps.version.outputs.tag }}
+            ghcr.io/ai-pipestream/pipestream-frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.29.0
         with:
-          image-ref: ghcr.io/ai-pipestream/platform-shell:latest
+          image-ref: ghcr.io/ai-pipestream/pipestream-frontend:latest
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -105,10 +105,10 @@ jobs:
           docker rm -f test-shell 2>/dev/null || true
 
           echo "Pulling amd64 image for testing..."
-          docker pull --platform linux/amd64 ghcr.io/ai-pipestream/platform-shell:latest
+          docker pull --platform linux/amd64 ghcr.io/ai-pipestream/pipestream-frontend:latest
 
           echo "Starting container (note: backend services may not be available in test environment)"
-          docker run -d --name test-shell -p 38106:38106 ghcr.io/ai-pipestream/platform-shell:latest
+          docker run -d --name test-shell -p 38106:38106 ghcr.io/ai-pipestream/pipestream-frontend:latest
 
           echo "Waiting for frontend to be ready..."
           for i in {1..30}; do
@@ -152,7 +152,7 @@ jobs:
           event-type: dockerhub-publish
           client-payload: |
             {
-              "base_image": "ghcr.io/ai-pipestream/platform-shell",
-              "dockerhub_repo": "pipestreamai/platform-shell",
+              "base_image": "ghcr.io/ai-pipestream/pipestream-frontend",
+              "dockerhub_repo": "pipestreamai/pipestream-frontend",
               "tags": "${{ steps.version.outputs.tag }} latest"
             }

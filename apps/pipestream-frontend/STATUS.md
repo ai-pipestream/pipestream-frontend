@@ -9,7 +9,7 @@
    - Now using `@ai-pipestream/protobuf-forms` workspace package for all service stubs and types.
    - Protos are synced directly from `pipestream-protos` and generated locally in `packages/protobuf-forms`.
 4. **Build System**:
-   - Verified backend build (`platform-shell`) with `tsc`.
+   - Verified backend build (`pipestream-frontend`) with `tsc`.
    - Verified frontend build (`ui`) with `vite`.
    - Workspace-wide dependency management via `pnpm` catalogs.
 5. **Dependencies**: All source files updated to use `@ai-pipestream/*` workspace scopes.
@@ -17,8 +17,8 @@
 ## 🔄 Current Architecture
 
 - **Service Stubs**: Generated in `packages/protobuf-forms` from `pipestream-protos`.
-- **Backend Proxy**: `apps/platform-shell` handles dynamic service discovery and routing.
-- **Frontend UI**: `apps/platform-shell/ui` provides the unified management interface.
+- **Backend Proxy**: `apps/pipestream-frontend` handles dynamic service discovery and routing.
+- **Frontend UI**: `apps/pipestream-frontend/ui` provides the unified management interface.
 
 ## 🚀 Next Steps
 
@@ -28,4 +28,4 @@
 
 ## Status Summary
 
-The `platform-shell` is now fully operational and aligned with the "Schema-First" architecture, using local stub generation instead of external registry-published stubs. This ensures consistent builds in locked-down environments.
+The `pipestream-frontend` is now fully operational and aligned with the "Schema-First" architecture, using local stub generation instead of external registry-published stubs. This ensures consistent builds in locked-down environments.

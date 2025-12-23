@@ -43,25 +43,25 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: apps/platform-shell/Dockerfile
+          file: apps/pipestream-frontend/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/ai-pipestream/platform-shell:${{ steps.version.outputs.tag }}
-            ghcr.io/ai-pipestream/platform-shell:nightly
+            ghcr.io/ai-pipestream/pipestream-frontend:${{ steps.version.outputs.tag }}
+            ghcr.io/ai-pipestream/pipestream-frontend:nightly
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.29.0
         with:
-          image-ref: ghcr.io/ai-pipestream/platform-shell:nightly
+          image-ref: ghcr.io/ai-pipestream/pipestream-frontend:nightly
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -72,9 +72,9 @@ jobs:
           docker rm -f test-shell 2>/dev/null || true
 
           echo "Pulling amd64 image for testing..."
-          docker pull --platform linux/amd64 ghcr.io/ai-pipestream/platform-shell:nightly
+          docker pull --platform linux/amd64 ghcr.io/ai-pipestream/pipestream-frontend:nightly
 
-          docker run -d --name test-shell -p 38106:38106 ghcr.io/ai-pipestream/platform-shell:nightly
+          docker run -d --name test-shell -p 38106:38106 ghcr.io/ai-pipestream/pipestream-frontend:nightly
           echo "Waiting for container to be ready..."
           for i in {1..30}; do
             if curl -f http://localhost:38106/ >/dev/null 2>&1; then

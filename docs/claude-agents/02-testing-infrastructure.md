@@ -142,7 +142,7 @@ export function mountWithVuetify(component: any, options = {}) {
 
 **A. Unit Test - Service Client**
 
-Create `apps/platform-shell/ui/src/services/account-manager/src/services/accountClient.test.ts`:
+Create `apps/pipestream-frontend/ui/src/services/account-manager/src/services/accountClient.test.ts`:
 
 ```typescript
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -181,7 +181,7 @@ describe('Account Client', () => {
 
 **B. Integration Test - Streaming Store**
 
-Create `apps/platform-shell/ui/src/stores/serviceRegistry.test.ts`:
+Create `apps/pipestream-frontend/ui/src/stores/serviceRegistry.test.ts`:
 
 ```typescript
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -266,7 +266,7 @@ describe('GrpcHealthStatus Component', () => {
 
 **D. E2E Test Example (Optional)**
 
-Create `apps/platform-shell/ui/tests/e2e/health-page.spec.ts` (if using Playwright):
+Create `apps/pipestream-frontend/ui/tests/e2e/health-page.spec.ts` (if using Playwright):
 
 ```typescript
 import { test, expect } from '@playwright/test'
@@ -373,13 +373,13 @@ export function createMockServiceDetails(overrides?: Partial<ServiceDetails>) {
 - Form validation tests
 - JSONForms integration tests
 
-`apps/platform-shell/ui/`:
+`apps/pipestream-frontend/ui/`:
 - Service client integration tests
 - Store tests
 - Composable tests
 - Route guard tests
 
-`apps/platform-shell/` (backend):
+`apps/pipestream-frontend/` (backend):
 - Connect route handler tests
 - Service resolver tests
 - Proxy logic tests
