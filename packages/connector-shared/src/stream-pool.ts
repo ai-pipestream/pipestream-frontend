@@ -20,12 +20,12 @@ const CONNECTOR_INTAKE_SERVICE_URL = process.env.CONNECTOR_INTAKE_SERVICE_URL ||
  */
 export class UploadClient {
   private client: Client<typeof ConnectorIntakeService>;
-  private connectorId: string;
+  private datasourceId: string;
   private apiKey: string;
   private sessionId: string;
 
   constructor(
-    connectorId: string,
+    datasourceId: string,
     apiKey: string,
     sessionId: string = ''
   ) {
@@ -37,11 +37,11 @@ export class UploadClient {
 
     // Create service client
     this.client = createClient(ConnectorIntakeService, intakeTransport);
-    this.connectorId = connectorId;
+    this.datasourceId = datasourceId;
     this.apiKey = apiKey;
     this.sessionId = sessionId;
 
-    console.log(chalk.cyan(`Created upload client for connector: ${connectorId}`));
+    console.log(chalk.cyan(`Created upload client for datasource: ${datasourceId}`));
   }
 
   /**
@@ -56,7 +56,7 @@ export class UploadClient {
   ): Promise<{ success: boolean; docId?: string; message?: string }> {
     try {
       const request = create(UploadBlobRequestSchema, {
-        connectorId: this.connectorId,
+        datasourceId: this.datasourceId,
         apiKey: this.apiKey,
         sessionId: this.sessionId,
         filename,
@@ -91,10 +91,10 @@ export class UploadClient {
   }
 
   /**
-   * Get the connector ID
+   * Get the datasource ID
    */
-  getConnectorId(): string {
-    return this.connectorId;
+  getDataSourceId(): string {
+    return this.datasourceId;
   }
 }
 
@@ -106,12 +106,12 @@ export class StreamPool {
   private uploadClient: UploadClient;
 
   constructor(
-    connectorId: string,
+    datasourceId: string,
     apiKey: string,
     crawlId: string,
     _poolSize: number = 1 // poolSize is ignored in new API
   ) {
-    this.uploadClient = new UploadClient(connectorId, apiKey, crawlId);
+    this.uploadClient = new UploadClient(datasourceId, apiKey, crawlId);
     console.log(chalk.cyan(`StreamPool initialized (using unary API)`));
   }
 

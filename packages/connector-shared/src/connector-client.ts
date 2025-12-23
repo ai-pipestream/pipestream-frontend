@@ -2,8 +2,8 @@ import { createClient } from '@connectrpc/connect';
 import { createGrpcTransport } from '@connectrpc/connect-node';
 import {
   ConnectorIntakeService,
-  ConnectorAdminService,
-  type ConnectorRegistration,
+  DataSourceAdminService,
+  type DataSource,
 } from '@ai-pipestream/protobuf-forms/generated';
 import chalk from 'chalk';
 
@@ -24,74 +24,73 @@ const connectorTransport = createGrpcTransport({
 
 // Create service clients
 const intakeClient = createClient(ConnectorIntakeService, intakeTransport);
-const connectorAdminClient = createClient(ConnectorAdminService, connectorTransport);
+const dataSourceAdminClient = createClient(DataSourceAdminService, connectorTransport);
 
 /**
  * Connector client for managing filesystem connector operations
  */
 export class ConnectorClient {
-  private connectorId: string | null = null;
+  private datasourceId: string | null = null;
   private apiKey: string | null = null;
-  private connectorConfig: ConnectorRegistration | null = null;
+  private datasourceConfig: DataSource | null = null;
 
   /**
-   * Register or get existing connector
+   * Register or get existing datasource
    */
   async registerConnector(
-    connectorName: string,
+    datasourceName: string,
     accountId: string,
     s3Bucket: string,
     s3BasePath: string
-  ): Promise<{ connectorId: string; apiKey: string }> {
+  ): Promise<{ datasourceId: string; apiKey: string }> {
     try {
-      // Try to get existing connector
+      // Try to get existing datasource
       // Add timeout to prevent hanging
-      const connector = await Promise.race([
-        connectorAdminClient.getConnector({ connectorId: connectorName }),
+      const datasource = await Promise.race([
+        dataSourceAdminClient.getDataSource({ datasourceId: datasourceName }),
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
       ]);
 
-      const registration = connector.connector;
+      const registration = datasource.datasource;
       if (!registration) {
-        throw new Error('Connector registration not found in response');
+        throw new Error('DataSource registration not found in response');
       }
-      console.log(chalk.green(`✓ Using existing connector: ${registration.connectorId}`));
-      this.connectorId = registration.connectorId;
+      console.log(chalk.green(`✓ Using existing datasource: ${registration.datasourceId}`));
+      this.datasourceId = registration.datasourceId;
       this.apiKey = registration.apiKey;
-      return { connectorId: registration.connectorId, apiKey: registration.apiKey };
+      return { datasourceId: registration.datasourceId, apiKey: registration.apiKey };
     } catch (error: any) {
-      // Connector doesn't exist, register it
+      // DataSource doesn't exist, create it
       if (error.code === 'NOT_FOUND' || error.message?.includes('not found') || error.message === 'Timeout') {
-        console.log(chalk.yellow(`Registering new connector: ${connectorName}`));
+        console.log(chalk.yellow(`Creating new datasource: ${datasourceName}`));
         
-        const response = await connectorAdminClient.registerConnector({
-          connectorName: connectorName,
-          connectorType: 'filesystem',
+        const response = await dataSourceAdminClient.createDataSource({
+          name: datasourceName,
           accountId: accountId,
-          s3Bucket: s3Bucket,
-          s3BasePath: s3BasePath,
-          defaultMetadata: {
+          metadata: {
             'source': 'filesystem-connector',
             'connector-type': 'filesystem',
-          },
-          maxFileSize: BigInt(104857600), // 100MB
-          rateLimitPerMinute: BigInt(1000),
+            's3_bucket': s3Bucket,
+            's3_base_path': s3BasePath,
+            'max_file_size': '104857600', // 100MB
+            'rate_limit': '1000'
+          }
         });
 
-        console.log(chalk.green(`✓ Registered connector: ${response.connectorId}`));
-        this.connectorId = response.connectorId;
-        this.apiKey = response.apiKey;
-        return { connectorId: response.connectorId, apiKey: response.apiKey };
+        console.log(chalk.green(`✓ Created datasource: ${response.datasource?.datasourceId}`));
+        this.datasourceId = response.datasource?.datasourceId ?? '';
+        this.apiKey = response.datasource?.apiKey ?? ''; 
+        return { datasourceId: response.datasource?.datasourceId ?? '', apiKey: response.datasource?.apiKey ?? '' };
       }
       throw error;
     }
   }
 
   /**
-   * Set credentials for an existing connector (skip registration)
+   * Set credentials for an existing datasource (skip registration)
    */
-  setCredentials(connectorId: string, apiKey: string): void {
-    this.connectorId = connectorId;
+  setCredentials(datasourceId: string, apiKey: string): void {
+    this.datasourceId = datasourceId;
     this.apiKey = apiKey;
   }
 
@@ -99,21 +98,17 @@ export class ConnectorClient {
    * Start a crawl session
    */
   async startCrawlSession(crawlId: string): Promise<string> {
-    if (!this.connectorId || !this.apiKey) {
-      throw new Error('Connector not registered. Call registerConnector() first.');
+    if (!this.datasourceId || !this.apiKey) {
+      throw new Error('DataSource not registered. Call registerConnector() first.');
     }
 
     const response = await intakeClient.startCrawlSession({
-      connectorId: this.connectorId,
+      datasourceId: this.datasourceId,
       apiKey: this.apiKey,
       crawlId: crawlId,
       metadata: {
         connectorType: 'filesystem',
         connectorVersion: '1.0.0',
-        crawlStarted: {
-          seconds: BigInt(Math.floor(Date.now() / 1000)),
-          nanos: 0,
-        },
         sourceSystem: 'local-filesystem',
       },
       trackDocuments: true,
@@ -193,13 +188,13 @@ export class ConnectorClient {
   }
 
   /**
-   * Get connector ID
+   * Get datasource ID
    */
-  getConnectorId(): string {
-    if (!this.connectorId) {
-      throw new Error('Connector not registered');
+  getDataSourceId(): string {
+    if (!this.datasourceId) {
+      throw new Error('DataSource not registered');
     }
-    return this.connectorId;
+    return this.datasourceId;
   }
 
   /**
@@ -207,7 +202,7 @@ export class ConnectorClient {
    */
   getApiKey(): string {
     if (!this.apiKey) {
-      throw new Error('Connector not registered');
+      throw new Error('DataSource not registered');
     }
     return this.apiKey;
   }
