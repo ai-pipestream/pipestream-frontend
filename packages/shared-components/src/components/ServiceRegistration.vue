@@ -25,7 +25,7 @@
           
           <v-col cols="12" md="6">
             <v-text-field
-              v-model="serviceInfo.serviceName"
+              v-model="serviceInfo.name"
               label="Service Name"
               variant="outlined"
               density="compact"
@@ -67,24 +67,26 @@
 
           <v-col cols="12" md="4">
             <v-text-field
-              v-model="serviceInfo.host"
-              label="Host"
+              v-model="serviceInfo.advertisedHost"
+              label="Advertised Host"
               variant="outlined"
               density="compact"
               :rules="[v => !!v || 'Host is required']"
               placeholder="localhost or IP"
+              hint="Host clients use to connect"
             />
           </v-col>
 
           <v-col cols="12" md="4">
             <v-text-field
-              v-model.number="serviceInfo.port"
-              label="Primary Port"
+              v-model.number="serviceInfo.advertisedPort"
+              label="Advertised Port"
               variant="outlined"
               density="compact"
               type="number"
               :rules="[v => !!v || 'Port is required', v => v > 0 || 'Invalid port']"
               placeholder="8080"
+              hint="Port clients use to connect"
             />
           </v-col>
 
@@ -102,7 +104,7 @@
           <!-- Service Type and Version -->
           <v-col cols="12" md="6">
             <v-select
-              v-model="serviceInfo.serviceType"
+              v-model="serviceInfo.type"
               label="Service Type"
               :items="serviceTypes"
               item-title="label"
@@ -390,7 +392,10 @@ import { create } from '@bufbuild/protobuf'
 // import { createClient } from '@connectrpc/connect'
 // import { PlatformRegistrationService } from '@ai-pipestream/protobuf-forms/generated'
 import {
-  RegisterRequestSchema
+  RegisterRequestSchema,
+  ConnectivitySchema,
+  ServiceType,
+  type HttpEndpoint
 } from '@ai-pipestream/protobuf-forms/generated'
 
 interface Props {
@@ -412,13 +417,6 @@ const loading = ref(false)
 const streaming = ref(false)
 const testing = ref(false)
 
-// Define enum replacements as constants since they're no longer in proto
-const ServiceType = {
-  APPLICATION: 'APPLICATION',
-  MODULE: 'MODULE',
-  INFRASTRUCTURE: 'INFRASTRUCTURE'
-} as const
-
 const HealthCheckType = {
   HTTP: 'HTTP',
   GRPC: 'GRPC',
@@ -439,21 +437,44 @@ const ServiceRegistrationEventType = {
   SERVICE_UPDATED: 'SERVICE_UPDATED'
 } as const
 
-// Service info matching the proto
+// Health check definition for UI
+interface HealthCheck {
+  type: 'HTTP' | 'GRPC' | 'TCP'
+  endpoint?: string  // path/endpoint for health check
+  interval: string
+  timeout: string
+  deregisterAfter?: string
+}
+
+// Service info matching the new proto structure
 const serviceInfo = reactive({
-  serviceName: '',
-  serviceId: '',
-  host: 'localhost',
-  port: 8080,
-  grpcPort: 0,
-  description: '',
+  // Basic info
+  name: '',  // was serviceName
+  serviceId: '',  // UI only, for display
   version: '1.0.0',
-  serviceType: ServiceType.APPLICATION,
-  iconSvgBase64: '',
+  type: ServiceType.SERVICE,  // SERVICE, MODULE, or CONNECTOR
+
+  // Connectivity (replaces flat host/port)
+  advertisedHost: 'localhost',
+  advertisedPort: 8080,
+  internalHost: '',  // optional
+  internalPort: 0,   // optional
+  tlsEnabled: false,
+  grpcPort: 0,       // UI convenience
+
+  // Metadata and discovery
+  description: '',   // UI only, stored in metadata
+  iconSvgBase64: '', // UI only
   capabilities: [] as string[],
   tags: [] as string[],
-  healthChecks: [] as any[],
-  metadata: {} as Record<string, string>
+  healthChecks: [] as HealthCheck[],  // UI only for now
+  metadata: {} as Record<string, string>,
+
+  // HTTP endpoints (optional)
+  httpEndpoints: [] as Partial<HttpEndpoint>[],
+  httpSchema: '',
+  httpSchemaVersion: '',
+  httpSchemaArtifactId: ''
 })
 
 // Metadata fields for UI
@@ -472,11 +493,11 @@ const registrationStatus = ref<RegistrationStatusDisplay | null>(null)
 const registeredService = ref<any>(null)
 const streamEvents = ref<any[]>([])
 
-// Options for dropdowns
+// Options for dropdowns - matches proto ServiceType enum
 const serviceTypes = [
-  { label: 'Application', value: ServiceType.APPLICATION },
+  { label: 'Service', value: ServiceType.SERVICE },
   { label: 'Module', value: ServiceType.MODULE },
-  { label: 'Infrastructure', value: ServiceType.INFRASTRUCTURE }
+  { label: 'Connector', value: ServiceType.CONNECTOR }
 ]
 
 const healthCheckTypes = [
@@ -526,11 +547,11 @@ const testConnection = async () => {
     await new Promise(resolve => setTimeout(resolve, 1500))
     
     // In real implementation, would test actual connection
-    console.log('Testing connection to:', `http://${serviceInfo.host}:${serviceInfo.port}`)
-    
+    console.log('Testing connection to:', `http://${serviceInfo.advertisedHost}:${serviceInfo.advertisedPort}`)
+
     registrationStatus.value = {
       success: true,
-      message: `Successfully connected to ${serviceInfo.host}:${serviceInfo.port}`
+      message: `Successfully connected to ${serviceInfo.advertisedHost}:${serviceInfo.advertisedPort}`
     }
   } catch (error) {
     registrationStatus.value = {
@@ -547,12 +568,21 @@ const registerService = async () => {
   registrationStatus.value = null
   
   try {
-    // Create proper protobuf message
+    // Create proper protobuf message using new proto structure
     const serviceRegistrationRequest = create(RegisterRequestSchema, {
-      serviceName: serviceInfo.serviceName,
-      host: serviceInfo.host,
-      port: serviceInfo.port,
-      metadata: buildMetadata()
+      name: serviceInfo.name,
+      type: serviceInfo.type,
+      connectivity: create(ConnectivitySchema, {
+        advertisedHost: serviceInfo.advertisedHost,
+        advertisedPort: serviceInfo.advertisedPort,
+        internalHost: serviceInfo.internalHost || undefined,
+        internalPort: serviceInfo.internalPort || undefined,
+        tlsEnabled: serviceInfo.tlsEnabled
+      }),
+      version: serviceInfo.version,
+      metadata: buildMetadata(),
+      tags: serviceInfo.tags,
+      capabilities: serviceInfo.capabilities
     })
 
     // TODO: When backend is ready, uncomment this to use real gRPC
@@ -576,7 +606,7 @@ const registerService = async () => {
     // Create mock response (will be replaced when backend is ready)
     const mockResponse = {
       success: true,
-      message: `Service '${serviceInfo.serviceName}' registered successfully`,
+      message: `Service '${serviceInfo.name}' registered successfully`,
       registeredAt: new Date().toISOString(),
       consulServiceId: `consul-${serviceInfo.serviceId}`,
       databaseId: `db-${Date.now()}`,

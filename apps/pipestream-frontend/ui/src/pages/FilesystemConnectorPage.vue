@@ -215,7 +215,7 @@ const canUpload = computed(() => {
 
 // Initialize API client
 const apiClient = createUploadApiClient({
-  baseUrl: 'http://localhost:38106'
+  baseUrl: ''
 });
 
 async function checkConnectorStatus() {

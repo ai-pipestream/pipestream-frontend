@@ -45,7 +45,7 @@ else
 fi
 
 # Copy all proto files from each module
-for module in common admin config design engine intake linear-processor opensearch parser pipeline-module registration repo schemamanager testing-harness ui-ux; do
+for module in common admin config connector-types design engine engine-kafka-sidecar intake linear-processor opensearch parser pipeline-module registration repo schemamanager testing-harness ui-ux; do
   if [ -d "$TEMP_DIR/$module/proto" ]; then
     cp -r "$TEMP_DIR/$module/proto/"* "$DEST/"
     echo "  ✓ Copied $module protos"

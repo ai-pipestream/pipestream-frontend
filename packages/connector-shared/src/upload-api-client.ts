@@ -100,7 +100,7 @@ export class UploadApiClient {
    */
   async checkStatus(): Promise<{ initialized: boolean; sessionId?: string }> {
     try {
-      const response = await this.fetchWithTimeout(`${this.baseUrl}/health`);
+      const response = await this.fetchWithTimeout(`${this.baseUrl}/api/health`);
       const data = await response.json() as { connectorId: string; sessionId?: string };
       return {
         initialized: data.connectorId === 'initialized',

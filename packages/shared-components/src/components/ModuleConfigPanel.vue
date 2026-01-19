@@ -85,7 +85,7 @@ async function loadModules() {
   error.value = ''
   try {
     const client = createPlatformRegistrationClient()
-    const resp = await client.listModules({} as any)
+    const resp = await client.listPlatformModules({} as any)
     const list = (resp.modules ?? []).map((m: any) => ({ name: m.moduleName || m.serviceName }))
     modules.value = list
     if (props.initialModule && list.some((m: { name: string }) => m.name === props.initialModule)) {

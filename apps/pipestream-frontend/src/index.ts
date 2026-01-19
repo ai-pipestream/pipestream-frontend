@@ -348,7 +348,7 @@ app.post('/api/upload/folder', async (req, res) => {
     });
 });
 
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.json({ 
         connectorId: 'initialized',
         sessionId: 'test-session-123'

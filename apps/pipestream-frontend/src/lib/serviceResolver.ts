@@ -52,6 +52,17 @@ async function watchAndCacheServices() {
  * This is a synchronous lookup against the in-memory cache.
  */
 export function resolveService(serviceName: string): { host: string; port: number } {
+  // Alias account-manager to account-service
+  if (serviceName === 'account-manager' && !serviceRegistry.has('account-manager') && serviceRegistry.has('account-service')) {
+    console.log(`[ServiceResolver] Aliasing ${serviceName} to account-service`);
+    serviceName = 'account-service';
+  }
+
+  if (serviceName === 'connector-service' && !serviceRegistry.has('connector-service') && serviceRegistry.has('connector-admin')) {
+    console.log(`[ServiceResolver] Aliasing ${serviceName} to connector-admin`);
+    serviceName = 'connector-admin';
+  }
+
   const serviceDetails = serviceRegistry.get(serviceName);
 
   if (!serviceDetails) {

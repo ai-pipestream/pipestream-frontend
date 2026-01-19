@@ -50,10 +50,15 @@ export async function createDataSource(
   }) as CreateDataSourceRequest
 
   const response = await dataSourceClient.createDataSource(request)
+  
+  if (!response.datasource) {
+    throw new Error('Create response missing datasource data')
+  }
+
   return {
     success: response.success,
-    datasource_id: response.datasourceId,
-    api_key: response.apiKey,
+    datasource_id: response.datasource.datasourceId,
+    api_key: response.datasource.apiKey,
     message: response.message
   }
 }

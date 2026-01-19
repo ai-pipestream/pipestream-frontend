@@ -36,7 +36,9 @@ const platformItems: NavItem[] = [
 // Service names must match exactly what Consul returns
 const serviceConfig = [
   { service: 'account-manager', path: '/accounts', title: 'Account Manager', icon: 'mdi-account-group' },
+  { service: 'account-service', path: '/accounts', title: 'Account Manager', icon: 'mdi-account-group' },
   { service: 'connector-service', path: '/admin-connector', title: 'Connectors', icon: 'mdi-power-plug' },
+  { service: 'connector-admin', path: '/admin-connector', title: 'Connectors', icon: 'mdi-power-plug' },
   { service: 'mapping-service', path: '/mapping', title: 'Mapping', icon: 'mdi-map' },
   { service: 'opensearch-manager', path: '/opensearch-manager', title: 'OpenSearch Manager', icon: 'mdi-magnify' },
   { service: 'platform-registration-service', path: '/registration', title: 'Registration', icon: 'mdi-server' },
