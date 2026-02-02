@@ -21,16 +21,16 @@
     "pnpm": ">=10.0.0"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.10.2",
-    "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-express": "^2.1.1",
-    "@connectrpc/connect-node": "^2.1.1",
-    "@connectrpc/connect-web": "^2.1.1",
-    "@jsonforms/core": "^3.7.0",
-    "@jsonforms/vue": "^3.7.0",
-    "@jsonforms/vue-vanilla": "^3.7.0",
-    "@jsonforms/vue-vuetify": "^3.7.0",
-    "vue": "^3.5.26",
-    "vuetify": "^3.11.4"
+    "@bufbuild/protobuf": "catalog:",
+    "@connectrpc/connect": "catalog:",
+    "@connectrpc/connect-express": "catalog:",
+    "@connectrpc/connect-node": "catalog:",
+    "@connectrpc/connect-web": "catalog:",
+    "@jsonforms/core": "catalog:",
+    "@jsonforms/vue": "catalog:",
+    "@jsonforms/vue-vanilla": "catalog:",
+    "@jsonforms/vue-vuetify": "catalog:",
+    "vue": "catalog:",
+    "vuetify": "catalog:"
   }
 }
