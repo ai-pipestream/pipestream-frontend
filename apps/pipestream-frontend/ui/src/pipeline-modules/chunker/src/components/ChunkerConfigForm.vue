@@ -517,11 +517,10 @@ export default {
 
         console.log('Submitting form with data:', this.formData)
 
-        // Create pure JSON request matching OpenAPI schema
+        // Create pure JSON request (no config_id; node/step id is the identifier in pipeline)
         const jsonRequest = {
           text: this.sampleText,
           config: {
-            configId: `config-${Date.now()}`,
             algorithm: this.formData.algorithm || 'token',
             sourceField: this.formData.sourceField || 'body',
             chunkSize: this.formData.chunkSize || 500,
