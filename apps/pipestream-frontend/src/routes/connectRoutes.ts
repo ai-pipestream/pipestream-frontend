@@ -10,7 +10,8 @@ import {
   NodeUploadService,
   PipeDocService,
   AccountService,
-  DataSourceAdminService
+  DataSourceAdminService,
+  DesignModeService
 } from "@ai-pipestream/protobuf-forms/generated";
 import { createDynamicTransport, resolveService } from "../lib/serviceResolver.js";
 
@@ -256,6 +257,46 @@ export default (router: ConnectRouter) => {
       const transport = createDynamicTransport(targetBackend);
       const client = createClient(PipeStepProcessorService, transport);
       return client.processData(req);
+    }
+  });
+
+  // Design Mode Service proxy
+  router.service(DesignModeService, {
+    createDesignGraph(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "design-mode";
+      const transport = createDynamicTransport(target);
+      const client = createClient(DesignModeService, transport);
+      return client.createDesignGraph(req);
+    },
+    simulatePipeline(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "design-mode";
+      const transport = createDynamicTransport(target);
+      const client = createClient(DesignModeService, transport);
+      return client.simulatePipeline(req);
+    },
+    testNode(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "design-mode";
+      const transport = createDynamicTransport(target);
+      const client = createClient(DesignModeService, transport);
+      return client.testNode(req);
+    },
+    validateDesignGraph(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "design-mode";
+      const transport = createDynamicTransport(target);
+      const client = createClient(DesignModeService, transport);
+      return client.validateDesignGraph(req);
+    },
+    deployGraph(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "design-mode";
+      const transport = createDynamicTransport(target);
+      const client = createClient(DesignModeService, transport);
+      return client.deployGraph(req);
+    },
+    listDesignGraphs(req: any, context: any) {
+      const target = context.requestHeader.get("x-target-backend") || "design-mode";
+      const transport = createDynamicTransport(target);
+      const client = createClient(DesignModeService, transport);
+      return client.listDesignGraphs(req);
     }
   });
   

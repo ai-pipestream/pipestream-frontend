@@ -32,6 +32,10 @@ const platformItems: NavItem[] = [
   { title: 'Components', icon: 'mdi-view-dashboard', to: '/components' },
 ];
 
+const pipelineItems: NavItem[] = [
+  { title: 'Designer', icon: 'mdi-vector-polyline', to: '/pipelines/designer' },
+];
+
 // Service configuration - only shown if service is available
 // Service names must match exactly what Consul returns
 const serviceConfig = [
@@ -56,6 +60,12 @@ const pipelineModuleConfig = [
 // Build navigation items dynamically based on available services
 const navItems = computed(() => {
   const items: NavItem[] = [...platformItems];
+
+  items.push({
+    title: 'Pipelines',
+    icon: 'mdi-pipe',
+    children: pipelineItems,
+  } as NavItem);
 
   // Add services as a collapsible group if any are available
   const availableServiceItems = serviceConfig

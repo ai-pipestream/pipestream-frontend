@@ -51,6 +51,37 @@ async function watchAndCacheServices() {
  * Resolves a service name to its actual host:port from the live registry.
  * This is a synchronous lookup against the in-memory cache.
  */
+function isConnectProtocol(serviceDetails: GetServiceResponse): boolean {
+  const metadata = (serviceDetails as any).metadata || {};
+  const protocol = (metadata.protocol || metadata.transport || "").toString().toLowerCase();
+  if (protocol === "connect" || protocol === "http") {
+    return true;
+  }
+
+  const tags: string[] = Array.isArray((serviceDetails as any).tags) ? (serviceDetails as any).tags : [];
+  return tags.some((tag) => {
+    const normalized = tag.toLowerCase();
+    return normalized === "connect" || normalized === "protocol:connect" || normalized === "transport:http";
+  });
+}
+
+function pickHttpEndpoint(serviceDetails: GetServiceResponse): { host: string; port: number } | null {
+  const endpoints = (serviceDetails as any).httpEndpoints || [];
+  if (!Array.isArray(endpoints) || endpoints.length === 0) {
+    return null;
+  }
+
+  const endpoint = endpoints[0];
+  if (!endpoint || !endpoint.host || !endpoint.port) {
+    return null;
+  }
+
+  return {
+    host: endpoint.host,
+    port: endpoint.port,
+  };
+}
+
 export function resolveService(serviceName: string): { host: string; port: number } {
   // Alias account-manager to account-service
   if (serviceName === 'account-manager' && !serviceRegistry.has('account-manager') && serviceRegistry.has('account-service')) {
@@ -85,16 +116,23 @@ export function resolveService(serviceName: string): { host: string; port: numbe
     throw new Error(`[ServiceResolver] Service "${serviceName}" not found in live registry. It may be unhealthy or not registered.`);
   }
 
+  const httpEndpoint = pickHttpEndpoint(serviceDetails);
+  const preferHttp = isConnectProtocol(serviceDetails);
+  const resolvedHost = preferHttp && httpEndpoint ? httpEndpoint.host : serviceDetails.host;
+  const resolvedPort = preferHttp && httpEndpoint ? httpEndpoint.port : serviceDetails.port;
+  const finalHost = resolvedHost || serviceDetails.host;
+  const finalPort = resolvedPort || serviceDetails.port;
+
   // Normalize localhost variants to IPv4 loopback to avoid IPv6 (::1) dial issues
   const normalizedHost = (() => {
-    const h = (serviceDetails.host || "").toLowerCase();
+    const h = (finalHost || "").toLowerCase();
     if (h === "localhost" || h === "::1" || h === "0.0.0.0") return "127.0.0.1";
-    return serviceDetails.host;
+    return finalHost;
   })();
 
   const result = {
     host: normalizedHost,
-    port: serviceDetails.port,
+    port: finalPort,
   };
 
   // console.log(`[ServiceResolver] Resolved ${serviceName} to ${result.host}:${result.port} from live registry.`);

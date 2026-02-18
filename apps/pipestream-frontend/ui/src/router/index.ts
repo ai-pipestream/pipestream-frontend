@@ -43,6 +43,18 @@ const platformRoutes: RouteRecordRaw[] = [
 // Service routes - application services (long-running)
 const serviceRoutes: RouteRecordRaw[] = [
   {
+    path: '/pipelines/designer',
+    name: 'pipelines-designer',
+    component: () => import('../services/pipeline-designer/src/App.vue'),
+    children: [
+      {
+        path: '',
+        name: 'pipelines-designer-home',
+        component: () => import('../services/pipeline-designer/src/views/PipelineDesignerView.vue'),
+      },
+    ],
+  },
+  {
     path: '/accounts',
     name: 'accounts',
     component: () => import('../services/account-manager/src/App.vue'),
