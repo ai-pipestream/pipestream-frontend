@@ -1,8 +1,8 @@
-import { WatchHealthResponseSchema, ShellService, type WatchHealthResponse, HealthCheckResponse_ServingStatus as ServingStatus } from '@ai-pipestream/protobuf-forms/generated'
+import { WatchHealthResponseSchema, type WatchHealthResponse, HealthCheckResponse_ServingStatus as ServingStatus } from '@ai-pipestream/protobuf-forms/generated'
 import { create } from '@bufbuild/protobuf'
-import { Code, ConnectError, createClient } from '@connectrpc/connect'
-import { createConnectTransport } from '@connectrpc/connect-web'
+import { Code, ConnectError } from '@connectrpc/connect'
 import { onUnmounted, readonly, ref, shallowRef, type Ref } from 'vue'
+import { shellClient } from '../services/connect'
 
 interface HealthSnapshot {
   services: Array<{
@@ -26,12 +26,6 @@ class ShellHealthManager {
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null
   private referenceCount = 0
   private streamPromise: Promise<void> | null = null
-
-  private transport = createConnectTransport({
-    baseUrl: window.location.origin,
-    useBinaryFormat: true
-  })
-  private client = createClient(ShellService, this.transport)
 
   // HMR-aware cleanup: if module is being hot-reloaded, cleanup immediately
   private isHMRReloading = false
@@ -135,7 +129,7 @@ class ShellHealthManager {
       this.isConnected.value = true
       this.isUsingFallback.value = false
 
-      for await (const update of this.client.watchHealth({}, {
+      for await (const update of shellClient.watchHealth({}, {
         signal: this.abortController.signal,
         timeoutMs: undefined
       })) {

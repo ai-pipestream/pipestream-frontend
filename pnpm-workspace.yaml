@@ -13,8 +13,8 @@ catalog:
   '@jsonforms/vue': ^3.7.0
   '@jsonforms/vue-vanilla': ^3.7.0
   '@jsonforms/vue-vuetify': ^3.7.0
-  vue: ^3.5.27
-  vuetify: ^3.11.8
+  vue: ^3.5.30
+  vuetify: ^4.0.2
 
 onlyBuiltDependencies:
   - '@bufbuild/buf'

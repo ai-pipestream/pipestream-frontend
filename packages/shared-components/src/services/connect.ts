@@ -1,10 +1,13 @@
 import { createClient, type Transport } from '@connectrpc/connect'
 import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistrationService, PipeStepProcessorService } from '@ai-pipestream/protobuf-forms/generated'
+import { ShellService } from '@ai-pipestream/protobuf-forms/generated'
 
-// Create a browser transport pointing to the web-proxy Connect API
-export function createWebProxyTransport(base?: string): Transport {
-  // Default to same-origin (relative URLs work in all environments)
+/**
+ * Creates a browser transport pointing to the Node.js Shell BFF.
+ * All communication is strictly Protobuf over HTTP (Connect-ES).
+ */
+export function createShellTransport(base?: string): Transport {
+  // Default to same-origin
   const baseUrl = base ?? window.location.origin
   return createConnectTransport({
     baseUrl,
@@ -12,24 +15,13 @@ export function createWebProxyTransport(base?: string): Transport {
   })
 }
 
-// Note: to avoid leaking generated types in public d.ts (TS2742),
-// we keep return types broad.
-export function createPlatformRegistrationClient(transport?: Transport): any {
-  return createClient(PlatformRegistrationService, transport ?? createWebProxyTransport())
+/**
+ * The primary client for the frontend.
+ * Instead of multiple microservice clients, the UI uses this unified facade.
+ */
+export function createShellClient(transport?: Transport): any {
+  return createClient(ShellService, transport ?? createShellTransport())
 }
 
-// PipeStepProcessor requests must set x-target-backend header to the module service name
-export function createPipeStepProcessorClient(moduleServiceName: string, base?: string): any {
-  const baseUrl = base ?? window.location.origin
-  const transport = createConnectTransport({
-    baseUrl,
-    useBinaryFormat: true,
-    interceptors: [
-      (next) => async (req) => {
-        req.header.set('x-target-backend', moduleServiceName)
-        return next(req)
-      }
-    ]
-  })
-  return createClient(PipeStepProcessorService, transport)
-}
+// Global instance for convenience
+export const shellClient = createShellClient()

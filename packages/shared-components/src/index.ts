@@ -34,6 +34,9 @@ export { default as ModuleConfigPanel } from './components/ModuleConfigPanel.vue
 // Shared Composables
 export { useShellHealth } from './composables/useShellHealth'
 
+// Services & Clients
+export * from './services/connect'
+
 // Component Categories
 export const componentCategories = {
   display: ['PipeDocPreview', 'ResponseViewer'],

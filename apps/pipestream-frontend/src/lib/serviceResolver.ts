@@ -1,31 +1,98 @@
-import { createClient } from "@connectrpc/connect";
+import { createClient, type Client, type Transport } from "@connectrpc/connect";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { PlatformRegistrationService, type GetServiceResponse } from "@ai-pipestream/protobuf-forms/generated";
+import Consul from 'consul';
 
-// This map holds the live state of all healthy, registered services.
-// It is populated by the WatchServices stream.
-const serviceRegistry = new Map<string, GetServiceResponse>();
+// Discovery Configuration
+const DISCOVERY_MODE = (process.env.DISCOVERY_MODE || 'static').toLowerCase(); // 'static' or 'consul'
+const CONSUL_HOST = process.env.CONSUL_HOST || 'localhost';
+const CONSUL_PORT = process.env.CONSUL_PORT || '8500';
 
-// Get platform-registration-service URL from environment or use default
+// Fallback / Static Config
 const REGISTRATION_HOST = process.env.PLATFORM_REGISTRATION_HOST || 'localhost';
-const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '38101';
-const REGISTRATION_URL = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
+const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '18101'; 
 
-console.log(`[ServiceResolver] Using platform-registration-service at ${REGISTRATION_URL}`);
+console.log(`[ServiceResolver] Config: DISCOVERY_MODE=${DISCOVERY_MODE}, REG_HOST=${REGISTRATION_HOST}, REG_PORT=${REGISTRATION_PORT}`);
 
-// Create a persistent transport to platform-registration-service
-const registrationTransport = createGrpcTransport({
-  baseUrl: REGISTRATION_URL,
-  idleConnectionTimeoutMs: 1000 * 60 * 60, // 1 hour for idle connections
+// Live state
+const serviceRegistry = new Map<string, GetServiceResponse>();
+let registrationClient: Client<typeof PlatformRegistrationService> | null = null;
+let registrationTransport: Transport | null = null;
+
+const consul = new Consul({
+  host: CONSUL_HOST,
+  port: CONSUL_PORT,
+  promisify: true
 });
 
-const registrationClient = createClient(PlatformRegistrationService, registrationTransport);
+/**
+ * Resolves the URL for the platform-registration-service.
+ */
+async function resolveRegistrationUrl(): Promise<string> {
+  if (DISCOVERY_MODE === 'consul') {
+    console.log(`[ServiceResolver] Discovering platform-registration-service via Consul at ${CONSUL_HOST}:${CONSUL_PORT}...`);
+    try {
+      // @ts-ignore
+      const services = await consul.catalog.service.nodes('platform-registration-service');
+      if (services && services.length > 0) {
+        const s = services[0];
+        const host = s.ServiceAddress || s.Address;
+        const port = s.ServicePort;
+        console.log(`[ServiceResolver] Found platform-registration-service in Consul at ${host}:${port}`);
+        return `http://${host}:${port}`;
+      }
+      console.warn(`[ServiceResolver] platform-registration-service not found in Consul, falling back to static config.`);
+    } catch (err) {
+      console.error(`[ServiceResolver] Consul discovery failed:`, err);
+    }
+  }
+  
+  // Static/Fallback mode
+  const url = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
+  console.log(`[ServiceResolver] Using static platform-registration-service at ${url}`);
+  return url;
+}
+
+/**
+ * Initializes the discovery layer.
+ */
+export async function initializeDiscovery() {
+  const baseUrl = await resolveRegistrationUrl();
+  
+  registrationTransport = createGrpcTransport({
+    baseUrl,
+    idleConnectionTimeoutMs: 1000 * 60 * 60,
+  });
+
+  registrationClient = createClient(PlatformRegistrationService, registrationTransport);
+  
+  // Start the background watch
+  watchAndCacheServices();
+}
+
+/**
+ * Gets the registration transport, ensuring it's initialized.
+ */
+export function getRegistrationTransport(): Transport {
+  if (!registrationTransport) {
+    // Synchronous fallback for immediate access if needed, 
+    // but initializeDiscovery should ideally be awaited at app start.
+    const url = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
+    registrationTransport = createGrpcTransport({
+      baseUrl: url,
+      idleConnectionTimeoutMs: 1000 * 60 * 60,
+    });
+  }
+  return registrationTransport;
+}
 
 /**
  * Watches the platform-registration-service for real-time updates of all
  * healthy services. This function runs continuously in the background.
  */
 async function watchAndCacheServices() {
+  if (!registrationClient) return;
+
   console.log("[ServiceResolver] Starting to watch for service updates...");
   try {
     const stream = registrationClient.watchServices({});
@@ -42,14 +109,13 @@ async function watchAndCacheServices() {
     }
   } catch (error) {
     console.error("[ServiceResolver] Watch stream failed:", error);
-    console.log("[ServiceResolver] Retrying watch in 5 seconds...");
-    setTimeout(watchAndCacheServices, 5000); // Retry after 5 seconds
+    console.log("[ServiceResolver] Retrying discovery initialization in 5 seconds...");
+    setTimeout(initializeDiscovery, 5000);
   }
 }
 
 /**
- * Resolves a service name to its actual host:port from the live registry.
- * This is a synchronous lookup against the in-memory cache.
+ * Protocol detection logic.
  */
 function isConnectProtocol(serviceDetails: GetServiceResponse): boolean {
   const metadata = (serviceDetails as any).metadata || {};
@@ -83,22 +149,17 @@ function pickHttpEndpoint(serviceDetails: GetServiceResponse): { host: string; p
 }
 
 export function resolveService(serviceName: string): { host: string; port: number } {
-  // Alias account-manager to account-service
+  // Alias mapping
   if (serviceName === 'account-manager' && !serviceRegistry.has('account-manager') && serviceRegistry.has('account-service')) {
-    console.log(`[ServiceResolver] Aliasing ${serviceName} to account-service`);
     serviceName = 'account-service';
   }
-
   if (serviceName === 'connector-service' && !serviceRegistry.has('connector-service') && serviceRegistry.has('connector-admin')) {
-    console.log(`[ServiceResolver] Aliasing ${serviceName} to connector-admin`);
     serviceName = 'connector-admin';
   }
 
   const serviceDetails = serviceRegistry.get(serviceName);
 
   if (!serviceDetails) {
-    console.log(`[ServiceResolver] Service "${serviceName}" not found in live registry. Available services:`, Array.from(serviceRegistry.keys()));
-    
     // Fallback: Try to resolve common module services directly
     const fallbackPorts: Record<string, number> = {
       'echo': 39000,
@@ -109,11 +170,10 @@ export function resolveService(serviceName: string): { host: string; port: numbe
     };
     
     if (fallbackPorts[serviceName]) {
-      console.log(`[ServiceResolver] Using fallback for "${serviceName}" -> localhost:${fallbackPorts[serviceName]}`);
       return { host: '127.0.0.1', port: fallbackPorts[serviceName] };
     }
     
-    throw new Error(`[ServiceResolver] Service "${serviceName}" not found in live registry. It may be unhealthy or not registered.`);
+    throw new Error(`[ServiceResolver] Service "${serviceName}" not found in live registry.`);
   }
 
   const httpEndpoint = pickHttpEndpoint(serviceDetails);
@@ -123,20 +183,17 @@ export function resolveService(serviceName: string): { host: string; port: numbe
   const finalHost = resolvedHost || serviceDetails.host;
   const finalPort = resolvedPort || serviceDetails.port;
 
-  // Normalize localhost variants to IPv4 loopback to avoid IPv6 (::1) dial issues
+  // Normalize localhost
   const normalizedHost = (() => {
     const h = (finalHost || "").toLowerCase();
     if (h === "localhost" || h === "::1" || h === "0.0.0.0") return "127.0.0.1";
     return finalHost;
   })();
 
-  const result = {
+  return {
     host: normalizedHost,
     port: finalPort,
   };
-
-  // console.log(`[ServiceResolver] Resolved ${serviceName} to ${result.host}:${result.port} from live registry.`);
-  return result;
 }
 
 /**
@@ -146,8 +203,7 @@ export function createDynamicTransport(serviceName:string) {
     const { host, port } = resolveService(serviceName);
     return createGrpcTransport({
         baseUrl: `http://${host}:${port}`,
-        // Disable timeouts for streaming connections
-        idleConnectionTimeoutMs: 1000 * 60 * 60 // 1 hour for idle connections
+        idleConnectionTimeoutMs: 1000 * 60 * 60
     });
 }
 
@@ -159,5 +215,5 @@ export function clearServiceRegistry() {
   console.log("[ServiceResolver] Service registry cleared.");
 }
 
-// Start watching for service updates in the background.
-watchAndCacheServices();
+// Initial trigger
+initializeDiscovery();

@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       exclude: ['@ai-pipestream/protobuf-forms'],
       force: true,  // Force re-optimization on server start
-      esbuildOptions: {
+      rolldownOptions: {
         target: 'es2020',
       },
     },

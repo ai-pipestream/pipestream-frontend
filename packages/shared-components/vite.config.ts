@@ -39,10 +39,7 @@ export default defineConfig({
         globals: {
           vue: 'Vue',
           vuetify: 'Vuetify'
-        },
-        // Preserve the original file structure in dist
-        preserveModules: true,
-        preserveModulesRoot: 'src'
+        }
       }
     }
   },

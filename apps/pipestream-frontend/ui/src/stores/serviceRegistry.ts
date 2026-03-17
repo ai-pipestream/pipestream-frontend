@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { createClient, ConnectError, Code } from '@connectrpc/connect'
-import { createConnectTransport } from '@connectrpc/connect-web'
-import { PlatformRegistrationService } from '@ai-pipestream/protobuf-forms/generated'
+import { shellClient } from '@ai-pipestream/shared-components'
 
 export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
   // State
@@ -16,21 +14,8 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
   // Fetch services (polling)
   const fetchServices = async (): Promise<void> => {
     try {
-      // console.log('[ServiceRegistry] Polling services...')
-      const transport = createConnectTransport({
-        baseUrl: window.location.origin,
-        useBinaryFormat: true
-      })
-
-      const client = createClient(PlatformRegistrationService, transport)
-      const response = await client.listServices({})
-
-      const services = new Set<string>()
-      for (const details of response.services) {
-        if (details.isHealthy) {
-          services.add(details.serviceName)
-        }
-      }
+      const response = await shellClient.listUiServices({})
+      const services = new Set<string>(response.serviceNames || [])
 
       // Only update and log if services actually changed
       const current = availableServices.value
@@ -50,21 +35,8 @@ export const useServiceRegistryStore = defineStore('serviceRegistry', () => {
   // Fetch modules (polling)
   const fetchModules = async (): Promise<void> => {
     try {
-      // console.log('[ServiceRegistry] Polling modules...')
-      const transport = createConnectTransport({
-        baseUrl: window.location.origin,
-        useBinaryFormat: true
-      })
-
-      const client = createClient(PlatformRegistrationService, transport)
-      const response = await client.listPlatformModules({})
-
-      const modules = new Set<string>()
-      for (const details of response.modules) {
-        if (details.isHealthy) {
-          modules.add(details.moduleName)
-        }
-      }
+      const response = await shellClient.listUiModules({})
+      const modules = new Set<string>(response.moduleNames || [])
 
       // Only update and log if modules actually changed
       const current = availableModules.value

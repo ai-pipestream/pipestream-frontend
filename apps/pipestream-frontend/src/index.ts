@@ -32,7 +32,7 @@ app.get('/proxy/health', (req, res) => {
 // System status endpoint - reports overall backend health
 app.get('/api/system-status', async (req, res) => {
     const REGISTRATION_HOST = process.env.PLATFORM_REGISTRATION_HOST || 'localhost';
-    const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '38101';
+    const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '18101';
     const REGISTRATION_URL = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
 
     const status = {
@@ -282,7 +282,7 @@ app.get('/connect/system/health-snapshot', async (req, res) => {
 
     // Platform registration fixed location
     const REGISTRATION_HOST = process.env.PLATFORM_REGISTRATION_HOST || 'localhost';
-    const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '38101';
+    const REGISTRATION_PORT = process.env.PLATFORM_REGISTRATION_PORT || '18101';
     const REGISTRATION_URL = `http://${REGISTRATION_HOST}:${REGISTRATION_PORT}`;
 
     async function checkService(serviceName: string) {

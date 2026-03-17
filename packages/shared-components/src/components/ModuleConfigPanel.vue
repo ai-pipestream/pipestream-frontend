@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { createPlatformRegistrationClient, createPipeStepProcessorClient } from '../services/connect'
+import { shellClient } from '../services/connect'
 import { UniversalConfigCard } from '..'
 
 type ModuleItem = { title: string; value: string }
@@ -69,9 +69,9 @@ const loadingModules = ref(false)
 const loadingSchema = ref(false)
 const error = ref('')
 
-const modules = ref<{ name: string }[]>([])
+const modules = ref<string[]>([])
 const selectedModule = ref('')
-const moduleItems = computed<ModuleItem[]>(() => modules.value.map((m: { name: string }) => ({ title: m.name, value: m.name })))
+const moduleItems = computed<ModuleItem[]>(() => modules.value.map((m: string) => ({ title: m, value: m })))
 
 const schema = ref<any | null>(null)
 const config = ref<any>({})
@@ -84,15 +84,14 @@ async function loadModules() {
   loadingModules.value = true
   error.value = ''
   try {
-    const client = createPlatformRegistrationClient()
-    const resp = await client.listPlatformModules({} as any)
-    const list = (resp.modules ?? []).map((m: any) => ({ name: m.moduleName || m.serviceName }))
+    const resp = await shellClient.listUiModules({})
+    const list = resp.moduleNames || []
     modules.value = list
-    if (props.initialModule && list.some((m: { name: string }) => m.name === props.initialModule)) {
+    if (props.initialModule && list.includes(props.initialModule)) {
       selectedModule.value = props.initialModule
       await loadSchema()
     } else if (list.length > 0 && !selectedModule.value) {
-      selectedModule.value = list[0].name
+      selectedModule.value = list[0]
       await loadSchema()
     }
   } catch (e: any) {
@@ -107,14 +106,13 @@ async function loadSchema() {
   loadingSchema.value = true
   error.value = ''
   try {
-    const client = createPipeStepProcessorClient(selectedModule.value)
-    const reg = await client.getServiceRegistration({} as any)
-    if (!reg || !reg.jsonConfigSchema) {
+    const resp = await shellClient.getUiModuleConfigSchema({
+      moduleName: selectedModule.value
+    })
+    if (!resp || !resp.jsonConfigSchema) {
       throw new Error('Module did not provide a configuration schema')
     }
-    // Schema is a string
-    schema.value = JSON.parse(reg.jsonConfigSchema as string)
-    // Reset config to defaults; UniversalConfigCard will derive defaults too
+    schema.value = JSON.parse(resp.jsonConfigSchema as string)
     config.value = {}
   } catch (e: any) {
     error.value = e?.message ?? String(e)

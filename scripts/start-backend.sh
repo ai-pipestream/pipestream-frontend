@@ -58,8 +58,19 @@ fi
 # Set environment variables
 export PORT="$SERVICE_PORT"
 export NODE_ENV="${NODE_ENV:-development}"
+
+if [[ "$MOCK" == "true" ]]; then
+    print_status "info" "MOCK MODE ENABLED: Connecting to WireMock at port 50052"
+    export DISCOVERY_MODE="static"
+    export PLATFORM_REGISTRATION_PORT="50052"
+else
+    export DISCOVERY_MODE="${DISCOVERY_MODE:-consul}"
+    export PLATFORM_REGISTRATION_PORT="${PLATFORM_REGISTRATION_PORT:-18101}"
+fi
+
 export PLATFORM_REGISTRATION_HOST="${PLATFORM_REGISTRATION_HOST:-localhost}"
-export PLATFORM_REGISTRATION_PORT="${PLATFORM_REGISTRATION_PORT:-38101}"
+export CONSUL_HOST="${CONSUL_HOST:-localhost}"
+export CONSUL_PORT="${CONSUL_PORT:-8500}"
 
 print_status "success" "Starting backend at http://localhost:$SERVICE_PORT"
 print_status "info" "Press Ctrl+C to stop"

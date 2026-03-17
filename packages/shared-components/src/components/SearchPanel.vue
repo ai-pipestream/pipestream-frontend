@@ -54,27 +54,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { createClient } from '@connectrpc/connect'
-import { createConnectTransport } from '@connectrpc/connect-web'
-import { PipeDocService } from '@ai-pipestream/protobuf-forms/generated'
+import { shellClient } from '../services/connect'
 
 interface Props {
-  target?: string
-  drive?: string
   connectorId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  target: 'repository-service',
-  drive: 'pipedocs-drive',
   connectorId: '',
 })
-
-const transport = createConnectTransport({
-  baseUrl: window.location.origin,
-  useBinaryFormat: true
-})
-const repo = createClient(PipeDocService, transport)
 
 const query = ref('')
 const loading = ref(false)
@@ -94,30 +82,22 @@ async function runSearch() {
   hasSearched.value = true
   
   try {
-    const resp: any = await repo.listPipeDocs(
-      { drive: props.drive, connectorId: props.connectorId, limit: 50 },
-      { headers: { 'x-target-backend': props.target } }
-    )
-    const items: any[] = resp?.pipedocs || []
-    results.value = items.map((it: any) => ({
-      id: it.nodeId,
-      title: it.metadata?.title || it.docId || it.nodeId,
-      description: it.metadata?.description,
-      score: undefined,
-      snippet: undefined,
-      path: it.metadata?.path,
+    const resp = await shellClient.searchDocuments({
+      query: query.value,
+      pageSize: 50,
+      connectorId: props.connectorId
+    })
+    
+    results.value = (resp.results || []).map((it: any) => ({
+      id: it.docId,
+      title: it.filename || it.docId,
+      path: it.path,
+      score: it.score,
+      mimeType: it.mimeType,
+      accountId: it.accountId
     }))
   } catch (e: any) {
-    // Handle different error types gracefully
-    if (e?.message?.includes('415')) {
-      error.value = 'Search service temporarily unavailable. Please try again later.'
-    } else if (e?.message?.includes('404')) {
-      error.value = 'Repository service not found. Please check if services are running.'
-    } else if (e?.message?.includes('timeout')) {
-      error.value = 'Search request timed out. Please try again.'
-    } else {
-      error.value = `Search failed: ${e?.message || String(e)}`
-    }
+    error.value = `Search failed: ${e?.message || String(e)}`
     console.warn('[SearchPanel] Search error:', e)
   } finally {
     loading.value = false
